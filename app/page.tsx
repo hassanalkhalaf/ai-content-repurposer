@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { Sparkles, Loader2, TriangleAlert, Wand2 } from "lucide-react";
 import FormatSelector from "@/components/FormatSelector";
 import OutputCard from "@/components/OutputCard";
@@ -134,6 +134,9 @@ export default function DashboardPage() {
           {status === "success" && result && <OutputCard result={result} />}
         </section>
       </div>
+
+      {/* استدعاء نموذج التواصل ليعرض في نهاية الصفحة الرئيسية */}
+      <ContactForm />
     </main>
   );
 }
@@ -207,27 +210,8 @@ async function sendContactMessage(formData: FormData) {
   return await response.json();
 }
 
+// دالة نموذج التواصل المعدلة بدون تكرار
 function ContactForm() {
-  const [status, setStatus] = React.useState<"idle" | "loading" | "success" | "error">("idle");
-
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setStatus("loading");
-    const formData = new FormData(e.currentTarget);
-    try {
-      const data = await sendContactMessage(formData);
-      if (data.success) {
-        setStatus("success");
-        (e.target as HTMLFormElement).reset();
-      } else {
-        setStatus("error");
-      }
-    } catch (error) {
-      setStatus("error");
-    }
-  };
-
-  function ContactForm() {
   const [status, setStatus] = React.useState<"idle" | "loading" | "success" | "error">("idle");
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -285,10 +269,6 @@ function ContactForm() {
 
         {status === "success" && <p className="text-green-500 text-xs mt-2">تم الإرسال بنجاح! شكراً لك ❤️</p>}
         {status === "error" && <p className="text-red-500 text-xs mt-2">حدث خطأ، يرجى المحاولة لاحقاً.</p>}
-      </form>
-    </div>
-  );
-}
       </form>
     </div>
   );
