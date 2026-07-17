@@ -201,7 +201,7 @@ function ErrorState({ message, onRetry }: { message: string; onRetry: () => void
 // دالة إرسال الرسائل لـ Web3Forms
 async function sendContactMessage(formData: FormData) {
   // تذكر استبدال المفتاح بالـ Access Key الخاص بك من موقع web3forms
-  formData.append("access_key", "YOUR_ACCESS_KEY_HERE"); 
+  formData.append("access_key", "44aef164-55df-4168-ba90-3814f9a45c58"); 
 
   const response = await fetch("https://api.web3forms.com/submit", {
     method: "POST",
