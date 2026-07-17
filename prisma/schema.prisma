@@ -1,0 +1,28 @@
+// Not used by the MVP — the app is stateless by design.
+// Wire this in later (phase 2) if you want to persist generation history,
+// add accounts, or build a "recent generations" list.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Format {
+  TWITTER_THREAD
+  LINKEDIN_POST
+  BLOG_ARTICLE
+}
+
+model Generation {
+  id         String   @id @default(cuid())
+  format     Format
+  inputText  String   @db.Text
+  outputJson Json
+  createdAt  DateTime @default(now())
+
+  @@index([createdAt])
+}
