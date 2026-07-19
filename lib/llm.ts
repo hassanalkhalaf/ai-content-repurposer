@@ -9,7 +9,17 @@ import {
 
 const ANTHROPIC_API_URL = "https://api.anthropic.com/v1/messages";
 const ANTHROPIC_MODEL = "claude-sonnet-4-5-20250929";
-const REQUEST_TIMEOUT_MS = 30_000;
+const REQUEST_TIMEOUT_MS = 55_000; // stay under Vercel's maxDuration (60s) with a safety margin
+
+// Blog gets a lower cap on purpose — this is a hard backstop so a long
+// Arabic/English source can't push generation past our timeout even if the
+// prompt's word-count guidance is loosely followed. Twitter/LinkedIn are
+// naturally short, so their caps are just headroom, not a real constraint.
+const MAX_TOKENS_BY_FORMAT: Record<OutputFormat, number> = {
+  twitter: 900,
+  linkedin: 900,
+  blog: 1400,
+};
 
 export class LlmError extends Error {
   status: number;
@@ -55,7 +65,7 @@ export async function generateRepurposedContent(
       },
       body: JSON.stringify({
         model: ANTHROPIC_MODEL,
-        max_tokens: 2000,
+        max_tokens: MAX_TOKENS_BY_FORMAT[format],
         system: getSystemPrompt(format),
         messages: [
           {
