@@ -1,4 +1,4 @@
-export const runtime = 'edge';
+
 import { NextRequest, NextResponse } from "next/server";
 import { generateRepurposedContent, LlmError } from "@/lib/llm";
 import {
@@ -7,7 +7,7 @@ import {
   OutputFormat,
   RepurposeRequestBody,
 } from "@/lib/types";
-
+export const maxDuration = 60;
 const VALID_FORMATS: OutputFormat[] = ["twitter", "linkedin", "blog"];
 
 export async function POST(req: NextRequest) {
