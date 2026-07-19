@@ -2,6 +2,8 @@ import { OutputFormat } from "./types";
 
 const JSON_ONLY_RULE = `You must respond with ONLY valid JSON — no markdown code fences, no preamble, no commentary before or after. The response must be parseable by JSON.parse() as-is.`;
 
+const LANGUAGE_RULE = `LANGUAGE (critical): First, detect the dominant language of the user's source text (e.g. Arabic, English, or any other language). Then write 100% of your output — every field in the JSON, including headings, bullet points, and hashtags — in that exact same language. Do not translate, mix languages, or default to English. If the source text is in Arabic, the entire output must be in Arabic; if it's in English, the entire output must be in English; and so on for any other language. The only exception is a proper noun or brand name that has no natural equivalent in that language.`;
+
 const FORMAT_SYSTEM_PROMPTS: Record<OutputFormat, string> = {
   twitter: `You are an expert social media editor who repurposes long-form content into sharp Twitter/X threads.
 
@@ -14,6 +16,8 @@ Rules:
 - Tweet 5 closes with a takeaway or a call-to-thought (not a generic "follow for more").
 - Write in an engaging, punchy, conversational register. Avoid corporate tone and avoid hashtags in every tweet — at most one relevant hashtag, only on the last tweet, and only if it fits naturally.
 - Do not invent facts, statistics, or quotes that are not supported by the source text.
+
+${LANGUAGE_RULE}
 
 ${JSON_ONLY_RULE}
 
@@ -30,6 +34,8 @@ Rules:
 - Tone: professional but human. First person where appropriate. No corporate jargon, no emojis unless they meaningfully aid scannability (max 2 total).
 - End the post with exactly 3 relevant, specific hashtags (not generic ones like #business), on their own line.
 - Do not invent facts, statistics, or quotes that are not supported by the source text.
+
+${LANGUAGE_RULE}
 
 ${JSON_ONLY_RULE}
 
@@ -48,6 +54,8 @@ Rules:
 - Use short paragraphs (2-4 sentences), and bullet or numbered lists where they aid scannability.
 - Close with a brief conclusion or key-takeaways section.
 - Do not invent facts, statistics, or quotes that are not supported by the source text.
+
+${LANGUAGE_RULE}
 
 ${JSON_ONLY_RULE}
 

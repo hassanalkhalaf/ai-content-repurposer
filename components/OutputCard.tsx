@@ -4,6 +4,7 @@ import clsx from "clsx";
 import { FORMAT_LABELS, RepurposeData } from "@/lib/types";
 import CopyButton from "./CopyButton";
 import { renderMarkdownLite } from "@/lib/markdown-lite";
+import { directionClass } from "@/lib/rtl";
 
 const ACCENTS: Record<RepurposeData["format"], string> = {
   twitter: "text-signal-twitter",
@@ -37,12 +38,13 @@ function TwitterOutput({ tweets }: { tweets: string[] }) {
     <ol className="space-y-3">
       {tweets.map((tweet, i) => {
         const overLimit = tweet.length > 280;
+        const { dir, className } = directionClass(tweet);
         return (
           <li
             key={i}
             className="rounded-lg border border-line bg-paper/60 p-3.5"
           >
-            <div className="mb-2 flex items-center justify-between">
+            <div className="mb-2 flex items-center justify-between" dir="ltr">
               <span className="font-mono text-[11px] text-ink-faint">
                 {i + 1}/{tweets.length}
               </span>
@@ -55,7 +57,9 @@ function TwitterOutput({ tweets }: { tweets: string[] }) {
                 {tweet.length}/280
               </span>
             </div>
-            <p className="whitespace-pre-wrap text-sm leading-relaxed text-ink">{tweet}</p>
+            <p dir={dir} className={clsx("whitespace-pre-wrap text-sm leading-relaxed text-ink", className)}>
+              {tweet}
+            </p>
             <div className="mt-2.5 flex justify-end">
               <CopyButton text={tweet} label="Copy" />
             </div>
@@ -67,14 +71,18 @@ function TwitterOutput({ tweets }: { tweets: string[] }) {
 }
 
 function LinkedInOutput({ post }: { post: string }) {
+  const { dir, className } = directionClass(post);
   return (
-    <div className="whitespace-pre-wrap text-sm leading-relaxed text-ink">{post}</div>
+    <div dir={dir} className={clsx("whitespace-pre-wrap text-sm leading-relaxed text-ink", className)}>
+      {post}
+    </div>
   );
 }
 
 function BlogOutput({ title, content }: { title: string; content: string }) {
+  const { dir, className } = directionClass(`${title} ${content}`);
   return (
-    <article>
+    <article dir={dir} className={className}>
       <h1 className="mb-3 font-display text-2xl font-bold leading-snug tracking-tight text-ink">
         {title}
       </h1>
