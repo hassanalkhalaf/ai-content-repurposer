@@ -198,35 +198,40 @@ function ErrorState({ message, onRetry }: { message: string; onRetry: () => void
   );
 }
 
-// دالة إرسال الرسائل لـ Web3Forms
-async function sendContactMessage(formData: FormData) {
-  // تذكر استبدال المفتاح بالـ Access Key الخاص بك من موقع web3forms
-  formData.append("access_key", "44aef164-55df-4168-ba90-3814f9a45c58"); 
-
-  const response = await fetch("https://api.web3forms.com/submit", {
-    method: "POST",
-    body: formData
-  });
-  return await response.json();
-}
-
-// دالة نموذج التواصل المعدلة بدون تكرار
 function ContactForm() {
   const [status, setStatus] = React.useState<"idle" | "loading" | "success" | "error">("idle");
+  const [errorMsg, setErrorMsg] = React.useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setStatus("loading");
-    const formData = new FormData(e.currentTarget);
+    setErrorMsg(null);
+
+    const form = e.currentTarget;
+    const data = {
+      name: (form.elements.namedItem("name") as HTMLInputElement).value,
+      email: (form.elements.namedItem("email") as HTMLInputElement).value,
+      message: (form.elements.namedItem("message") as HTMLTextAreaElement).value,
+    };
+
     try {
-      const data = await sendContactMessage(formData);
-      if (data.success) {
-        setStatus("success");
-        (e.target as HTMLFormElement).reset();
-      } else {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      const body = await res.json();
+
+      if (!res.ok) {
+        setErrorMsg(body.error ?? "حدث خطأ، يرجى المحاولة لاحقاً.");
         setStatus("error");
+        return;
       }
-    } catch (error) {
+
+      setStatus("success");
+      form.reset();
+    } catch {
+      setErrorMsg("تعذر الاتصال بالسيرفر.");
       setStatus("error");
     }
   };
@@ -235,43 +240,23 @@ function ContactForm() {
     <div className="max-w-md mx-auto mt-16 mb-8 p-6 bg-panel border border-line rounded-card shadow-panel text-center">
       <h3 className="text-lg font-semibold text-ink mb-1">تواصل معي ✉️</h3>
       <p className="text-ink-soft text-xs mb-4">لديك ملاحظة أو فكرة لتطوير الموقع؟ أرسل لي مباشرة!</p>
-      
+
       <form onSubmit={handleSubmit} className="space-y-3">
-        <input 
-          type="text" 
-          name="name" 
-          required 
-          placeholder="اسمك الكريم"
-          className="w-full px-3 py-2 rounded-md bg-panel border border-line text-ink text-sm text-right focus:outline-none focus:border-accent"
-        />
-        <input 
-          type="email" 
-          name="email" 
-          required 
-          placeholder="بريدك الإلكتروني"
-          className="w-full px-3 py-2 rounded-md bg-panel border border-line text-ink text-sm text-left focus:outline-none focus:border-accent"
-        />
-        <textarea 
-          name="message" 
-          rows={3} 
-          required 
-          placeholder="اكتب اقتراحك أو رسالتك هنا..."
-          className="w-full px-3 py-2 rounded-md bg-panel border border-line text-ink text-sm text-right focus:outline-none focus:border-accent"
-        ></textarea>
-        
-        <button 
-          type="submit" 
-          disabled={status === "loading"}
-          className="w-full py-2 rounded-md bg-accent text-white text-xs font-medium hover:opacity-90 transition disabled:opacity-50"
-        >
+        <input type="text" name="name" required placeholder="اسمك الكريم"
+          className="w-full px-3 py-2 rounded-md bg-panel border border-line text-ink text-sm text-right focus:outline-none focus:border-accent" />
+        <input type="email" name="email" required placeholder="بريدك الإلكتروني"
+          className="w-full px-3 py-2 rounded-md bg-panel border border-line text-ink text-sm text-left focus:outline-none focus:border-accent" />
+        <textarea name="message" rows={3} required placeholder="اكتب اقتراحك أو رسالتك هنا..."
+          className="w-full px-3 py-2 rounded-md bg-panel border border-line text-ink text-sm text-right focus:outline-none focus:border-accent" />
+
+        <button type="submit" disabled={status === "loading"}
+          className="w-full py-2 rounded-md bg-accent text-white text-xs font-medium hover:opacity-90 transition disabled:opacity-50">
           {status === "loading" ? "جاري الإرسال..." : "إرسال الرسالة"}
         </button>
 
         {status === "success" && <p className="text-green-500 text-xs mt-2">تم الإرسال بنجاح! شكراً لك ❤️</p>}
-        {status === "error" && <p className="text-red-500 text-xs mt-2">حدث خطأ، يرجى المحاولة لاحقاً.</p>}
+        {status === "error" && <p className="text-red-500 text-xs mt-2">{errorMsg}</p>}
       </form>
     </div>
   );
 }
-
-
