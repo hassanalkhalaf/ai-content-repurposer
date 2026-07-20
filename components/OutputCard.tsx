@@ -34,8 +34,13 @@ export default function OutputCard({ result }: { result: RepurposeData }) {
   );
 }
 
+// Builds X's official "compose tweet" URL with the text pre-filled. This is
+// the only share method that works without OAuth/API access — it just opens
+// X's own compose window; the user still has to tap "Post" themselves.
+// There's no equivalent for auto-posting a whole thread without the user
+// connecting their account through X's API, which is out of scope here.
 function xComposeUrl(text: string): string {
-  return "https://twitter.com/intent/tweet?text=" + encodeURIComponent(text);
+  return `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
 }
 
 function TwitterOutput({ tweets }: { tweets: string[] }) {
@@ -45,7 +50,10 @@ function TwitterOutput({ tweets }: { tweets: string[] }) {
         const overLimit = tweet.length > 280;
         const { dir, className } = directionClass(tweet);
         return (
-          <li key={i} className="rounded-lg border border-line bg-paper/60 p-3.5">
+          <li
+            key={i}
+            className="rounded-lg border border-line bg-paper/60 p-3.5"
+          >
             <div className="mb-2 flex items-center justify-between" dir="ltr">
               <span className="font-mono text-[11px] text-ink-faint">
                 {i + 1}/{tweets.length}
@@ -63,7 +71,7 @@ function TwitterOutput({ tweets }: { tweets: string[] }) {
               {tweet}
             </p>
             <div className="mt-2.5 flex items-center justify-end gap-2">
-              
+              <a
                 href={xComposeUrl(tweet)}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -91,7 +99,9 @@ function LinkedInOutput({ post }: { post: string }) {
 }
 
 function BlogOutput({ title, content }: { title: string; content: string }) {
-  const { dir, className } = directionClass(title + " " + content);
+  // Detect direction from the title + content combined so a short title
+  // doesn't get misjudged on its own.
+  const { dir, className } = directionClass(`${title} ${content}`);
   return (
     <article dir={dir} className={className}>
       <h1 className="mb-3 font-display text-2xl font-bold leading-snug tracking-tight text-ink">
@@ -105,10 +115,10 @@ function BlogOutput({ title, content }: { title: string; content: string }) {
 function getFullCopyText(result: RepurposeData): string {
   switch (result.format) {
     case "twitter":
-      return result.data.tweets.map((t, i) => (i + 1) + "/" + result.data.tweets.length + " " + t).join("\n\n");
+      return result.data.tweets.map((t, i) => `${i + 1}/${result.data.tweets.length} ${t}`).join("\n\n");
     case "linkedin":
       return result.data.post;
     case "blog":
-      return "# " + result.data.title + "\n\n" + result.data.content;
+      return `# ${result.data.title}\n\n${result.data.content}`;
   }
 }
