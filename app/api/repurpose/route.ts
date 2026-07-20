@@ -1,4 +1,3 @@
-
 import { NextRequest, NextResponse } from "next/server";
 import { generateRepurposedContent, LlmError } from "@/lib/llm";
 import {
@@ -6,9 +5,13 @@ import {
   MIN_TRANSCRIPT_LENGTH,
   OutputFormat,
   RepurposeRequestBody,
+  TargetLanguage,
 } from "@/lib/types";
+
 export const maxDuration = 60;
+
 const VALID_FORMATS: OutputFormat[] = ["twitter", "linkedin", "blog"];
+const VALID_LANGUAGES: TargetLanguage[] = ["auto", "ar", "en", "fr", "es", "tr", "ur", "hi", "de"];
 
 export async function POST(req: NextRequest) {
   let body: RepurposeRequestBody;
@@ -21,7 +24,7 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const { transcript, format } = body ?? {};
+  const { transcript, format, targetLanguage } = body ?? {};
 
   if (typeof transcript !== "string" || transcript.trim().length === 0) {
     return NextResponse.json(
@@ -33,7 +36,7 @@ export async function POST(req: NextRequest) {
   if (transcript.trim().length < MIN_TRANSCRIPT_LENGTH) {
     return NextResponse.json(
       {
-        error: `That text is too short — add at least ${MIN_TRANSCRIPT_LENGTH} characters so there's enough to work with.`,
+        error: "That text is too short — add at least " + MIN_TRANSCRIPT_LENGTH + " characters so there's enough to work with.",
       },
       { status: 400 }
     );
@@ -42,7 +45,7 @@ export async function POST(req: NextRequest) {
   if (transcript.length > MAX_TRANSCRIPT_LENGTH) {
     return NextResponse.json(
       {
-        error: `That text is too long — please keep it under ${MAX_TRANSCRIPT_LENGTH.toLocaleString()} characters.`,
+        error: "That text is too long — please keep it under " + MAX_TRANSCRIPT_LENGTH.toLocaleString() + " characters.",
       },
       { status: 400 }
     );
@@ -55,14 +58,16 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  const resolvedLanguage: TargetLanguage =
+    targetLanguage && VALID_LANGUAGES.includes(targetLanguage) ? targetLanguage : "auto";
+
   try {
-    const result = await generateRepurposedContent(transcript.trim(), format);
+    const result = await generateRepurposedContent(transcript.trim(), format, resolvedLanguage);
     return NextResponse.json(result, { status: 200 });
   } catch (err) {
     if (err instanceof LlmError) {
       return NextResponse.json({ error: err.message }, { status: err.status });
     }
-    // Unexpected failure — never leak internals, never crash the process.
     console.error("Unexpected /api/repurpose error:", err);
     return NextResponse.json(
       { error: "Something went wrong while generating content. Please try again." },
