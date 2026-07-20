@@ -3,12 +3,14 @@
 import React, { useMemo, useState } from "react";
 import { Sparkles, Loader2, TriangleAlert, Wand2 } from "lucide-react";
 import FormatSelector from "@/components/FormatSelector";
+import LanguageSelector from "@/components/LanguageSelector";
 import OutputCard from "@/components/OutputCard";
 import {
   MAX_TRANSCRIPT_LENGTH,
   MIN_TRANSCRIPT_LENGTH,
   OutputFormat,
   RepurposeData,
+  TargetLanguage,
 } from "@/lib/types";
 
 type Status = "idle" | "loading" | "success" | "error";
@@ -16,6 +18,7 @@ type Status = "idle" | "loading" | "success" | "error";
 export default function DashboardPage() {
   const [transcript, setTranscript] = useState("");
   const [format, setFormat] = useState<OutputFormat>("twitter");
+  const [targetLanguage, setTargetLanguage] = useState<TargetLanguage>("auto");
   const [status, setStatus] = useState<Status>("idle");
   const [result, setResult] = useState<RepurposeData | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -37,7 +40,7 @@ export default function DashboardPage() {
       const res = await fetch("/api/repurpose", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ transcript, format }),
+        body: JSON.stringify({ transcript, format, targetLanguage }),
       });
 
       const body = await res.json().catch(() => null);
@@ -65,7 +68,6 @@ export default function DashboardPage() {
       <Header />
 
       <div className="mt-10 grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:items-start">
-        {/* Input panel */}
         <section className="rounded-card border border-line bg-panel shadow-panel">
           <div className="border-b border-line px-5 py-4">
             <h2 className="font-display text-sm font-semibold text-ink">Source content</h2>
@@ -99,6 +101,17 @@ export default function DashboardPage() {
               <FormatSelector value={format} onChange={setFormat} disabled={status === "loading"} />
             </div>
 
+            <div className="mt-5">
+              <h3 className="mb-2.5 text-xs font-semibold uppercase tracking-wide text-ink-faint">
+                لغة المخرجات
+              </h3>
+              <LanguageSelector
+                value={targetLanguage}
+                onChange={setTargetLanguage}
+                disabled={status === "loading"}
+              />
+            </div>
+
             <button
               type="button"
               onClick={handleRepurpose}
@@ -126,7 +139,6 @@ export default function DashboardPage() {
           </div>
         </section>
 
-        {/* Output panel */}
         <section aria-live="polite" className="min-h-[420px]">
           {status === "idle" && <EmptyState />}
           {status === "loading" && <LoadingState />}
@@ -135,7 +147,6 @@ export default function DashboardPage() {
         </section>
       </div>
 
-      {/* استدعاء نموذج التواصل ليعرض في نهاية الصفحة الرئيسية */}
       <ContactForm />
     </main>
   );
