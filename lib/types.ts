@@ -1,7 +1,9 @@
 export type OutputFormat = "twitter" | "linkedin" | "blog";
 
+export type TargetLanguage = "auto" | "ar" | "en" | "fr" | "es" | "tr" | "ur" | "hi" | "de";
+
 export interface TwitterThreadResult {
-  tweets: string[]; // exactly 5, each <= 280 chars
+  tweets: string[];
 }
 
 export interface LinkedInPostResult {
@@ -10,7 +12,7 @@ export interface LinkedInPostResult {
 
 export interface BlogArticleResult {
   title: string;
-  content: string; // markdown: H1 handled separately via `title`, body uses H2/H3
+  content: string;
 }
 
 export type RepurposeData =
@@ -21,6 +23,7 @@ export type RepurposeData =
 export interface RepurposeRequestBody {
   transcript: string;
   format: OutputFormat;
+  targetLanguage?: TargetLanguage;
 }
 
 export interface ApiErrorBody {
@@ -31,6 +34,29 @@ export const FORMAT_LABELS: Record<OutputFormat, string> = {
   twitter: "Twitter/X Thread",
   linkedin: "Professional LinkedIn Post",
   blog: "SEO-optimized Blog Article",
+};
+
+export const LANGUAGE_LABELS: Record<TargetLanguage, string> = {
+  auto: "نفس لغة النص",
+  ar: "العربية",
+  en: "الإنجليزية",
+  fr: "الفرنسية",
+  es: "الإسبانية",
+  tr: "التركية",
+  ur: "الأردية",
+  hi: "الهندية",
+  de: "الألمانية",
+};
+
+export const LANGUAGE_NAMES_FOR_PROMPT: Record<Exclude<TargetLanguage, "auto">, string> = {
+  ar: "Arabic",
+  en: "English",
+  fr: "French",
+  es: "Spanish",
+  tr: "Turkish",
+  ur: "Urdu",
+  hi: "Hindi",
+  de: "German",
 };
 
 export const MIN_TRANSCRIPT_LENGTH = 40;
