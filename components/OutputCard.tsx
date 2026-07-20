@@ -1,6 +1,7 @@
 "use client";
 
 import clsx from "clsx";
+import { ExternalLink } from "lucide-react";
 import { FORMAT_LABELS, RepurposeData } from "@/lib/types";
 import CopyButton from "./CopyButton";
 import { renderMarkdownLite } from "@/lib/markdown-lite";
@@ -33,6 +34,15 @@ export default function OutputCard({ result }: { result: RepurposeData }) {
   );
 }
 
+// Builds X's official "compose tweet" URL with the text pre-filled. This is
+// the only share method that works without OAuth/API access — it just opens
+// X's own compose window; the user still has to tap "Post" themselves.
+// There's no equivalent for auto-posting a whole thread without the user
+// connecting their account through X's API, which is out of scope here.
+function xComposeUrl(text: string): string {
+  return `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
+}
+
 function TwitterOutput({ tweets }: { tweets: string[] }) {
   return (
     <ol className="space-y-3">
@@ -60,7 +70,16 @@ function TwitterOutput({ tweets }: { tweets: string[] }) {
             <p dir={dir} className={clsx("whitespace-pre-wrap text-sm leading-relaxed text-ink", className)}>
               {tweet}
             </p>
-            <div className="mt-2.5 flex justify-end">
+            <div className="mt-2.5 flex items-center justify-end gap-2">
+              
+                href={xComposeUrl(tweet)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="focus-ring inline-flex items-center gap-1.5 rounded-full border border-line bg-panel px-3 py-1.5 text-xs font-medium text-ink-soft transition-colors hover:border-ink-faint hover:text-ink"
+              >
+                <ExternalLink size={13} strokeWidth={2} />
+                نشر على X
+              </a>
               <CopyButton text={tweet} label="Copy" />
             </div>
           </li>
