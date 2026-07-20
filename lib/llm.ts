@@ -4,17 +4,14 @@ import {
   LinkedInPostResult,
   OutputFormat,
   RepurposeData,
+  TargetLanguage,
   TwitterThreadResult,
 } from "./types";
 
 const ANTHROPIC_API_URL = "https://api.anthropic.com/v1/messages";
 const ANTHROPIC_MODEL = "claude-sonnet-4-5-20250929";
-const REQUEST_TIMEOUT_MS = 55_000; // stay under Vercel's maxDuration (60s) with a safety margin
+const REQUEST_TIMEOUT_MS = 55000;
 
-// Blog gets a lower cap on purpose — this is a hard backstop so a long
-// Arabic/English source can't push generation past our timeout even if the
-// prompt's word-count guidance is loosely followed. Twitter/LinkedIn are
-// naturally short, so their caps are just headroom, not a real constraint.
 const MAX_TOKENS_BY_FORMAT: Record<OutputFormat, number> = {
   twitter: 900,
   linkedin: 900,
@@ -30,18 +27,10 @@ export class LlmError extends Error {
   }
 }
 
-/**
- * Calls the Anthropic Messages API with a per-format system prompt and
- * parses/validates the JSON response into the shape the frontend expects.
- *
- * Swap-in note: to use OpenAI instead, replace the fetch call below with a
- * request to https://api.openai.com/v1/chat/completions (model: gpt-4o or
- * similar), using `response_format: { type: "json_object" }` for the same
- * strict-JSON guarantee, and keep the parsing/validation logic unchanged.
- */
 export async function generateRepurposedContent(
   transcript: string,
-  format: OutputFormat
+  format: OutputFormat,
+  targetLanguage: TargetLanguage = "auto"
 ): Promise<RepurposeData> {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {
@@ -66,7 +55,7 @@ export async function generateRepurposedContent(
       body: JSON.stringify({
         model: ANTHROPIC_MODEL,
         max_tokens: MAX_TOKENS_BY_FORMAT[format],
-        system: getSystemPrompt(format),
+        system: getSystemPrompt(format, targetLanguage),
         messages: [
           {
             role: "user",
@@ -84,7 +73,6 @@ export async function generateRepurposedContent(
         const body = await response.json();
         detail = body?.error?.message ?? "";
       } catch {
-        // ignore — body wasn't JSON
       }
 
       if (status === 401) {
@@ -103,7 +91,7 @@ export async function generateRepurposedContent(
         );
       }
       throw new LlmError(
-        `AI provider rejected the request${detail ? `: ${detail}` : "."}`,
+        "AI provider rejected the request" + (detail ? ": " + detail : "."),
         502
       );
     }
