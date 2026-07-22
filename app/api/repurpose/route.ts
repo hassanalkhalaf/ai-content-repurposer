@@ -10,7 +10,7 @@ import {
 
 export const maxDuration = 60;
 
-const VALID_FORMATS: OutputFormat[] = ["twitter", "linkedin", "blog"];
+const VALID_FORMATS: OutputFormat[] = ["twitter", "linkedin", "blog", "instagram"];
 const VALID_LANGUAGES: TargetLanguage[] = ["auto", "ar", "en", "fr", "es", "tr", "ur", "hi", "de"];
 
 export async function POST(req: NextRequest) {
@@ -23,16 +23,13 @@ export async function POST(req: NextRequest) {
       { status: 400 }
     );
   }
-
   const { transcript, format, targetLanguage } = body ?? {};
-
   if (typeof transcript !== "string" || transcript.trim().length === 0) {
     return NextResponse.json(
       { error: "Please paste some text to repurpose." },
       { status: 400 }
     );
   }
-
   if (transcript.trim().length < MIN_TRANSCRIPT_LENGTH) {
     return NextResponse.json(
       {
@@ -41,7 +38,6 @@ export async function POST(req: NextRequest) {
       { status: 400 }
     );
   }
-
   if (transcript.length > MAX_TRANSCRIPT_LENGTH) {
     return NextResponse.json(
       {
@@ -50,17 +46,14 @@ export async function POST(req: NextRequest) {
       { status: 400 }
     );
   }
-
   if (!format || !VALID_FORMATS.includes(format)) {
     return NextResponse.json(
       { error: "Please choose a valid output format." },
       { status: 400 }
     );
   }
-
   const resolvedLanguage: TargetLanguage =
     targetLanguage && VALID_LANGUAGES.includes(targetLanguage) ? targetLanguage : "auto";
-
   try {
     const result = await generateRepurposedContent(transcript.trim(), format, resolvedLanguage);
     return NextResponse.json(result, { status: 200 });
