@@ -25,12 +25,12 @@ export default function OutputCard({ result }: { result: RepurposeData }) {
           <ShareButton
             label="نشر على LinkedIn"
             getText={() => getFullCopyText(result)}
-            url={linkedinShareUrl()}
+            onOpen={() => openInNewTab(linkedinShareUrl())}
           />
           <ShareButton
             label="نشر على Instagram"
             getText={() => getFullCopyText(result)}
-            url={instagramShareUrl()}
+            onOpen={openInstagram}
           />
           <CopyButton text={getFullCopyText(result)} label="Copy all" />
         </div>
@@ -68,6 +68,33 @@ function instagramShareUrl(): string {
   return `https://www.instagram.com/`;
 }
 
+function openInNewTab(url: string) {
+  window.open(url, "_blank", "noopener,noreferrer");
+}
+
+// Tries Instagram's app deep link first (opens the native app directly to
+// the "new post" camera screen on a phone that has it installed). If the
+// app isn't installed, the OS silently ignores the custom scheme and
+// nothing happens — so after a short delay, if the tab is still visible
+// (meaning we never left for the app), we fall back to the normal website.
+// This works for anyone, not just a specific account, since it doesn't
+// depend on a username.
+function openInstagram() {
+  const fallbackTimer = window.setTimeout(() => {
+    if (document.visibilityState === "visible") {
+      openInNewTab(instagramShareUrl());
+    }
+  }, 1200);
+
+  const clearFallback = () => window.clearTimeout(fallbackTimer);
+  document.addEventListener("visibilitychange", clearFallback, { once: true });
+
+  // instagram://camera opens straight to the new-post/camera screen when
+  // the app is installed; unsupported on desktop browsers, where the
+  // fallback above kicks in almost immediately.
+  window.location.href = "instagram://camera";
+}
+
 // A share button that copies the given text to the clipboard, opens the
 // target platform in a new tab, and shows a brief "Copied" confirmation so
 // the user knows the clipboard step actually worked (clipboard writes can
@@ -75,11 +102,11 @@ function instagramShareUrl(): string {
 function ShareButton({
   label,
   getText,
-  url,
+  onOpen,
 }: {
   label: string;
   getText: () => string;
-  url: string;
+  onOpen: () => void;
 }) {
   const [status, setStatus] = useState<"idle" | "copied" | "failed">("idle");
 
@@ -90,7 +117,7 @@ function ShareButton({
     } catch {
       setStatus("failed");
     } finally {
-      window.open(url, "_blank", "noopener,noreferrer");
+      onOpen();
       setTimeout(() => setStatus("idle"), 2000);
     }
   };
