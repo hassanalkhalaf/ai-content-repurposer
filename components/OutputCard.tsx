@@ -1,7 +1,8 @@
 "use client";
 
+import { useState } from "react";
 import clsx from "clsx";
-import { ExternalLink } from "lucide-react";
+import { ExternalLink, Check } from "lucide-react";
 import { FORMAT_LABELS, RepurposeData } from "@/lib/types";
 import CopyButton from "./CopyButton";
 import { renderMarkdownLite } from "@/lib/markdown-lite";
@@ -21,18 +22,16 @@ export default function OutputCard({ result }: { result: RepurposeData }) {
           {FORMAT_LABELS[result.format]}
         </span>
         <div className="flex items-center gap-2">
-          <button
-            onClick={() => copyThenOpen(getFullCopyText(result), linkedinShareUrl())}
-            className="focus-ring inline-flex items-center gap-1.5 rounded-full border border-line bg-panel px-3 py-1.5 text-xs font-medium text-ink-soft transition-colors hover:border-ink-faint hover:text-ink"
-          >
-            نشر على LinkedIn
-          </button>
-          <button
-            onClick={() => copyThenOpen(getFullCopyText(result), instagramShareUrl())}
-            className="focus-ring inline-flex items-center gap-1.5 rounded-full border border-line bg-panel px-3 py-1.5 text-xs font-medium text-ink-soft transition-colors hover:border-ink-faint hover:text-ink"
-          >
-            نشر على Instagram
-          </button>
+          <ShareButton
+            label="نشر على LinkedIn"
+            getText={() => getFullCopyText(result)}
+            url={linkedinShareUrl()}
+          />
+          <ShareButton
+            label="نشر على Instagram"
+            getText={() => getFullCopyText(result)}
+            url={instagramShareUrl()}
+          />
           <CopyButton text={getFullCopyText(result)} label="Copy all" />
         </div>
       </div>
@@ -69,13 +68,54 @@ function instagramShareUrl(): string {
   return `https://www.instagram.com/`;
 }
 
-async function copyThenOpen(text: string, url: string) {
-  try {
-    await navigator.clipboard.writeText(text);
-  } catch {
-    // ignore — user can still paste manually if this fails
-  }
-  window.open(url, "_blank", "noopener,noreferrer");
+// A share button that copies the given text to the clipboard, opens the
+// target platform in a new tab, and shows a brief "Copied" confirmation so
+// the user knows the clipboard step actually worked (clipboard writes can
+// silently fail, e.g. if the page loses focus right as a new tab opens).
+function ShareButton({
+  label,
+  getText,
+  url,
+}: {
+  label: string;
+  getText: () => string;
+  url: string;
+}) {
+  const [status, setStatus] = useState<"idle" | "copied" | "failed">("idle");
+
+  const handleClick = async () => {
+    try {
+      await navigator.clipboard.writeText(getText());
+      setStatus("copied");
+    } catch {
+      setStatus("failed");
+    } finally {
+      window.open(url, "_blank", "noopener,noreferrer");
+      setTimeout(() => setStatus("idle"), 2000);
+    }
+  };
+
+  return (
+    <button
+      onClick={handleClick}
+      className="focus-ring relative inline-flex items-center gap-1.5 rounded-full border border-line bg-panel px-3 py-1.5 text-xs font-medium text-ink-soft transition-colors hover:border-ink-faint hover:text-ink"
+    >
+      {status === "copied" && (
+        <span className="absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-ink px-2 py-1 text-[11px] font-medium text-paper shadow-panel">
+          <span className="inline-flex items-center gap-1">
+            <Check size={12} strokeWidth={2.5} />
+            تم النسخ
+          </span>
+        </span>
+      )}
+      {status === "failed" && (
+        <span className="absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-red-600 px-2 py-1 text-[11px] font-medium text-paper shadow-panel">
+          فشل النسخ — انسخ يدويًا
+        </span>
+      )}
+      {label}
+    </button>
+  );
 }
 
 function TwitterOutput({ tweets }: { tweets: string[] }) {
