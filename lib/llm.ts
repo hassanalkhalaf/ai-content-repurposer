@@ -1,6 +1,7 @@
 import { getSystemPrompt } from "./prompts";
 import {
   BlogArticleResult,
+  InstagramCaptionResult,
   LinkedInPostResult,
   OutputFormat,
   RepurposeData,
@@ -16,6 +17,7 @@ const MAX_TOKENS_BY_FORMAT: Record<OutputFormat, number> = {
   twitter: 900,
   linkedin: 900,
   blog: 1400,
+  instagram: 700,
 };
 
 export class LlmError extends Error {
@@ -170,6 +172,40 @@ function parseAndValidate(rawText: string, format: OutputFormat): RepurposeData 
       }
       const result: BlogArticleResult = { title, content };
       return { format: "blog", data: result };
+    }
+    case "instagram": {
+      const hook = parsed?.hook;
+      const points = parsed?.points;
+      const cta = parsed?.cta;
+      const hashtags = parsed?.hashtags;
+      if (typeof hook !== "string" || hook.trim().length === 0) {
+        throw new LlmError("The AI response was missing the expected caption hook.", 502);
+      }
+      if (!Array.isArray(points) || points.length === 0) {
+        throw new LlmError("The AI response was missing the expected caption points.", 502);
+      }
+      if (typeof cta !== "string" || cta.trim().length === 0) {
+        throw new LlmError("The AI response was missing the expected caption call-to-action.", 502);
+      }
+      const cleanPoints = points
+        .filter((p: unknown): p is string => typeof p === "string" && p.trim().length > 0)
+        .slice(0, 5);
+      if (cleanPoints.length === 0) {
+        throw new LlmError("The AI response didn't contain any usable caption points.", 502);
+      }
+      const cleanHashtags = Array.isArray(hashtags)
+        ? hashtags
+            .filter((h: unknown): h is string => typeof h === "string" && h.trim().length > 0)
+            .map((h: string) => h.replace(/^#/, ""))
+            .slice(0, 5)
+        : [];
+      const result: InstagramCaptionResult = {
+        hook,
+        points: cleanPoints,
+        cta,
+        hashtags: cleanHashtags,
+      };
+      return { format: "instagram", data: result };
     }
   }
 }
