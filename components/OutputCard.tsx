@@ -20,7 +20,21 @@ export default function OutputCard({ result }: { result: RepurposeData }) {
         <span className={clsx("text-xs font-semibold uppercase tracking-wide", ACCENTS[result.format])}>
           {FORMAT_LABELS[result.format]}
         </span>
-        <CopyButton text={getFullCopyText(result)} label="Copy all" />
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => copyThenOpen(getFullCopyText(result), linkedinShareUrl())}
+            className="focus-ring inline-flex items-center gap-1.5 rounded-full border border-line bg-panel px-3 py-1.5 text-xs font-medium text-ink-soft transition-colors hover:border-ink-faint hover:text-ink"
+          >
+            نشر على LinkedIn
+          </button>
+          <button
+            onClick={() => copyThenOpen(getFullCopyText(result), instagramShareUrl())}
+            className="focus-ring inline-flex items-center gap-1.5 rounded-full border border-line bg-panel px-3 py-1.5 text-xs font-medium text-ink-soft transition-colors hover:border-ink-faint hover:text-ink"
+          >
+            نشر على Instagram
+          </button>
+          <CopyButton text={getFullCopyText(result)} label="Copy all" />
+        </div>
       </div>
 
       <div className="px-5 py-5">
@@ -41,6 +55,27 @@ export default function OutputCard({ result }: { result: RepurposeData }) {
 // connecting their account through X's API, which is out of scope here.
 function xComposeUrl(text: string): string {
   return `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
+}
+
+// LinkedIn and Instagram don't offer a "compose with prefilled text" URL the
+// way X does — neither exposes a public share endpoint that accepts text
+// without OAuth. The practical workaround is copy-to-clipboard + open the
+// platform, so the user pastes the text themselves once they're there.
+function linkedinShareUrl(): string {
+  return `https://www.linkedin.com/feed/?shareActive=true`;
+}
+
+function instagramShareUrl(): string {
+  return `https://www.instagram.com/`;
+}
+
+async function copyThenOpen(text: string, url: string) {
+  try {
+    await navigator.clipboard.writeText(text);
+  } catch {
+    // ignore — user can still paste manually if this fails
+  }
+  window.open(url, "_blank", "noopener,noreferrer");
 }
 
 function TwitterOutput({ tweets }: { tweets: string[] }) {
