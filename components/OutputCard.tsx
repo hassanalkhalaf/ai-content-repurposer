@@ -72,14 +72,27 @@ function openInNewTab(url: string) {
   window.open(url, "_blank", "noopener,noreferrer");
 }
 
-// Tries Instagram's app deep link first (opens the native app directly to
-// the "new post" camera screen on a phone that has it installed). If the
-// app isn't installed, the OS silently ignores the custom scheme and
-// nothing happens — so after a short delay, if the tab is still visible
-// (meaning we never left for the app), we fall back to the normal website.
-// This works for anyone, not just a specific account, since it doesn't
-// depend on a username.
+function isMobileDevice(): boolean {
+  return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+}
+
+// On desktop there's no app to deep-link into, and delaying window.open()
+// even briefly (e.g. inside a setTimeout fallback) makes most browsers
+// treat it as an untrusted popup and silently block it — so on desktop we
+// skip the deep link entirely and open the website immediately, in the
+// same click handler, which keeps it a "trusted" popup.
+//
+// On mobile we try the app deep link first (opens straight to Instagram's
+// new-post/camera screen if the app is installed) and fall back to the
+// website only if the tab is still visible after a short delay — that
+// delay is fine on mobile because navigating to the app (not a popup)
+// isn't subject to the same blocking behavior.
 function openInstagram() {
+  if (!isMobileDevice()) {
+    openInNewTab(instagramShareUrl());
+    return;
+  }
+
   const fallbackTimer = window.setTimeout(() => {
     if (document.visibilityState === "visible") {
       openInNewTab(instagramShareUrl());
@@ -89,9 +102,6 @@ function openInstagram() {
   const clearFallback = () => window.clearTimeout(fallbackTimer);
   document.addEventListener("visibilitychange", clearFallback, { once: true });
 
-  // instagram://camera opens straight to the new-post/camera screen when
-  // the app is installed; unsupported on desktop browsers, where the
-  // fallback above kicks in almost immediately.
   window.location.href = "instagram://camera";
 }
 
