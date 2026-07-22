@@ -12,6 +12,7 @@ const ACCENTS: Record<RepurposeData["format"], string> = {
   twitter: "text-signal-twitter",
   linkedin: "text-signal-linkedin",
   blog: "text-signal-blog",
+  instagram: "text-pink-600",
 };
 
 export default function OutputCard({ result }: { result: RepurposeData }) {
@@ -41,6 +42,14 @@ export default function OutputCard({ result }: { result: RepurposeData }) {
         {result.format === "linkedin" && <LinkedInOutput post={result.data.post} />}
         {result.format === "blog" && (
           <BlogOutput title={result.data.title} content={result.data.content} />
+        )}
+        {result.format === "instagram" && (
+          <InstagramOutput
+            hook={result.data.hook}
+            points={result.data.points}
+            cta={result.data.cta}
+            hashtags={result.data.hashtags}
+          />
         )}
       </div>
     </div>
@@ -224,6 +233,37 @@ function BlogOutput({ title, content }: { title: string; content: string }) {
   );
 }
 
+function InstagramOutput({
+  hook,
+  points,
+  cta,
+  hashtags,
+}: {
+  hook: string;
+  points: string[];
+  cta: string;
+  hashtags: string[];
+}) {
+  const { dir, className } = directionClass(`${hook} ${points.join(" ")} ${cta}`);
+  return (
+    <div dir={dir} className={clsx("space-y-4 text-sm leading-relaxed text-ink", className)}>
+      <p className="font-semibold">{hook}</p>
+      <ul className="space-y-1.5">
+        {points.map((point, i) => (
+          <li key={i} className="flex gap-2">
+            <span className="text-pink-500">•</span>
+            <span className="whitespace-pre-wrap">{point}</span>
+          </li>
+        ))}
+      </ul>
+      <p>{cta}</p>
+      <p className="text-ink-faint" dir="ltr">
+        {hashtags.map((tag) => `#${tag}`).join(" ")}
+      </p>
+    </div>
+  );
+}
+
 function getFullCopyText(result: RepurposeData): string {
   switch (result.format) {
     case "twitter":
@@ -232,5 +272,15 @@ function getFullCopyText(result: RepurposeData): string {
       return result.data.post;
     case "blog":
       return `# ${result.data.title}\n\n${result.data.content}`;
+    case "instagram":
+      return (
+        result.data.hook +
+        "\n\n" +
+        result.data.points.map((p) => `• ${p}`).join("\n") +
+        "\n\n" +
+        result.data.cta +
+        "\n\n" +
+        result.data.hashtags.map((tag) => `#${tag}`).join(" ")
+      );
   }
 }
