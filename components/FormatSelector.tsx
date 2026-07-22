@@ -1,6 +1,6 @@
 "use client";
 
-import { MessageSquareText, Briefcase, Newspaper } from "lucide-react";
+import { MessageSquareText, Briefcase, Newspaper, Instagram } from "lucide-react";
 import clsx from "clsx";
 import { OutputFormat } from "@/lib/types";
 
@@ -34,6 +34,13 @@ const OPTIONS: FormatOption[] = [
     icon: Newspaper,
     activeClasses: "border-signal-blog/30 bg-signal-blog/[0.06] text-signal-blog",
   },
+  {
+    value: "instagram",
+    label: "Instagram Caption",
+    sub: "Hook + points",
+    icon: Instagram,
+    activeClasses: "border-pink-500/30 bg-pink-500/[0.06] text-pink-600",
+  },
 ];
 
 interface Props {
@@ -47,7 +54,7 @@ export default function FormatSelector({ value, onChange, disabled }: Props) {
     <div
       role="radiogroup"
       aria-label="Output format"
-      className="grid grid-cols-1 gap-2 sm:grid-cols-3"
+      className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4"
     >
       {OPTIONS.map((opt) => {
         const isActive = opt.value === value;
