@@ -1,5 +1,4 @@
-export type OutputFormat = "twitter" | "linkedin" | "blog";
-
+export type OutputFormat = "twitter" | "linkedin" | "blog" | "instagram";
 export type TargetLanguage = "auto" | "ar" | "en" | "fr" | "es" | "tr" | "ur" | "hi" | "de";
 
 export interface TwitterThreadResult {
@@ -15,10 +14,18 @@ export interface BlogArticleResult {
   content: string;
 }
 
+export interface InstagramCaptionResult {
+  hook: string;
+  points: string[];
+  cta: string;
+  hashtags: string[];
+}
+
 export type RepurposeData =
   | { format: "twitter"; data: TwitterThreadResult }
   | { format: "linkedin"; data: LinkedInPostResult }
-  | { format: "blog"; data: BlogArticleResult };
+  | { format: "blog"; data: BlogArticleResult }
+  | { format: "instagram"; data: InstagramCaptionResult };
 
 export interface RepurposeRequestBody {
   transcript: string;
@@ -34,6 +41,7 @@ export const FORMAT_LABELS: Record<OutputFormat, string> = {
   twitter: "Twitter/X Thread",
   linkedin: "Professional LinkedIn Post",
   blog: "SEO-optimized Blog Article",
+  instagram: "Instagram Caption",
 };
 
 export const LANGUAGE_LABELS: Record<TargetLanguage, string> = {
