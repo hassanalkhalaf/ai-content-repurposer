@@ -142,3 +142,14 @@ export async function POST(req: NextRequest) {
       { status: 502 }
     );
   } finally {
+    clearTimeout(timeout);
+    await safeDeleteBlob(blobUrl);
+  }
+}
+
+async function safeDeleteBlob(url: string) {
+  try {
+    await del(url);
+  } catch {
+  }
+}
