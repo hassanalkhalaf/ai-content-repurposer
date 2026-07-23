@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
-import { Sparkles, Loader2, TriangleAlert, Wand2, Globe } from "lucide-react";
+import React, { useMemo, useRef, useState } from "react";
+import { Sparkles, Loader2, TriangleAlert, Wand2, Globe, Mic } from "lucide-react";
 import FormatSelector from "@/components/FormatSelector";
 import LanguageSelector from "@/components/LanguageSelector";
 import OutputCard from "@/components/OutputCard";
@@ -15,6 +15,7 @@ import {
 } from "@/lib/types";
 
 type Status = "idle" | "loading" | "success" | "error";
+type TranscribeStatus = "idle" | "uploading" | "error";
 
 const UI_LANGUAGE_ORDER: UILanguage[] = ["en", "ar", "fr", "es", "tr", "ur", "hi", "de"];
 
@@ -26,6 +27,10 @@ export default function DashboardPage() {
   const [result, setResult] = useState<RepurposeData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const { t } = useUILanguage();
+
+  const [transcribeStatus, setTranscribeStatus] = useState<TranscribeStatus>("idle");
+  const [transcribeError, setTranscribeError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const charCount = transcript.length;
   const isTooShort = charCount > 0 && charCount < MIN_TRANSCRIPT_LENGTH;
@@ -67,18 +72,95 @@ export default function DashboardPage() {
     }
   }
 
+  function handleTranscribeClick() {
+    fileInputRef.current?.click();
+  }
+
+  async function handleFileSelected(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    // Reset the input so selecting the same file again still fires onChange.
+    e.target.value = "";
+    if (!file) return;
+
+    setTranscribeStatus("uploading");
+    setTranscribeError(null);
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const res = await fetch("/api/transcribe", {
+        method: "POST",
+        body: formData,
+      });
+
+      const body = await res.json().catch(() => null);
+
+      if (!res.ok) {
+        const message =
+          body && typeof body.error === "string" ? body.error : t.transcribeErrorFallback;
+        setTranscribeError(message);
+        setTranscribeStatus("error");
+        return;
+      }
+
+      const text = typeof body?.text === "string" ? body.text : "";
+      setTranscript((prev) => (prev.trim().length > 0 ? prev + "\n\n" + text : text));
+      setTranscribeStatus("idle");
+    } catch {
+      setTranscribeError(t.transcribeErrorFallback);
+      setTranscribeStatus("error");
+    }
+  }
+
   return (
     <main className="mx-auto min-h-screen max-w-6xl px-6 py-10 sm:py-14">
       <Header />
 
       <div className="mt-10 grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:items-start">
         <section className="rounded-card border border-line bg-panel shadow-panel">
-          <div className="border-b border-line px-5 py-4">
-            <h2 className="font-display text-sm font-semibold text-ink">{t.sourceContentTitle}</h2>
-            <p className="mt-0.5 text-xs text-ink-soft">{t.sourceContentDesc}</p>
+          <div className="flex items-center justify-between border-b border-line px-5 py-4">
+            <div>
+              <h2 className="font-display text-sm font-semibold text-ink">{t.sourceContentTitle}</h2>
+              <p className="mt-0.5 text-xs text-ink-soft">{t.sourceContentDesc}</p>
+            </div>
+            <div className="flex flex-col items-end gap-1">
+              <button
+                type="button"
+                onClick={handleTranscribeClick}
+                disabled={transcribeStatus === "uploading" || status === "loading"}
+                className="focus-ring inline-flex shrink-0 items-center gap-1.5 rounded-full border border-line bg-panel px-3 py-1.5 text-xs font-medium text-ink-soft transition-colors hover:border-ink-faint hover:text-ink disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {transcribeStatus === "uploading" ? (
+                  <>
+                    <Loader2 size={13} className="animate-spin" />
+                    {t.transcribingButton}
+                  </>
+                ) : (
+                  <>
+                    <Mic size={13} strokeWidth={2} />
+                    {t.transcribeButton}
+                  </>
+                )}
+              </button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="audio/*,video/*"
+                onChange={handleFileSelected}
+                className="hidden"
+              />
+              <span className="text-[10px] text-ink-faint">{t.transcribeHint}</span>
+            </div>
           </div>
 
           <div className="px-5 py-5">
+            {transcribeError && (
+              <p className="mb-3 rounded-lg border border-red-200 bg-red-50/60 px-3 py-2 text-xs text-red-600">
+                {transcribeError}
+              </p>
+            )}
+
             <textarea
               value={transcript}
               onChange={(e) => setTranscript(e.target.value)}
