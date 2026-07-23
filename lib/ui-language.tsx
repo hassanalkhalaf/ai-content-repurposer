@@ -26,6 +26,10 @@ interface Translations {
   outputFormatLabel: string;
   outputLanguageLabel: string;
   sameAsSourceLanguage: string;
+  transcribeButton: string;
+  transcribingButton: string;
+  transcribeHint: string;
+  transcribeErrorFallback: string;
   siteLanguageLabel: string;
   repurposeButton: string;
   repurposingButton: string;
@@ -55,6 +59,10 @@ interface Translations {
 
 const TRANSLATIONS: Record<UILanguage, Translations> = {
   en: {
+    transcribeButton: "Transcribe audio/video",
+    transcribingButton: "Transcribing…",
+    transcribeHint: "MP3, MP4, WAV, or M4A — up to 25MB",
+    transcribeErrorFallback: "Could not transcribe that file. Please try again.",
     appTitle: "Repurpose",
     appTagline: "One transcript in. Every format out.",
     sourceContentTitle: "Source content",
@@ -90,6 +98,10 @@ const TRANSLATIONS: Record<UILanguage, Translations> = {
     contactErrorFallback: "Something went wrong, please try again.",
   },
   ar: {
+    transcribeButton: "تفريغ صوت/فيديو",
+    transcribingButton: "جارِ التفريغ…",
+    transcribeHint: "MP3، MP4، WAV، أو M4A — حتى 25 ميجابايت",
+    transcribeErrorFallback: "تعذّر تفريغ هذا الملف. حاول مرة أخرى.",
     appTitle: "Repurpose",
     appTagline: "من نص واحد... لكل الصيغ.",
     sourceContentTitle: "المحتوى المصدر",
@@ -125,6 +137,10 @@ const TRANSLATIONS: Record<UILanguage, Translations> = {
     contactErrorFallback: "حدث خطأ، يرجى المحاولة لاحقاً.",
   },
   fr: {
+    transcribeButton: "Transcrire audio/vidéo",
+    transcribingButton: "Transcription en cours…",
+    transcribeHint: "MP3, MP4, WAV ou M4A — jusqu'à 25 Mo",
+    transcribeErrorFallback: "Impossible de transcrire ce fichier. Veuillez réessayer.",
     appTitle: "Repurpose",
     appTagline: "Une transcription. Tous les formats.",
     sourceContentTitle: "Contenu source",
@@ -160,6 +176,10 @@ const TRANSLATIONS: Record<UILanguage, Translations> = {
     contactErrorFallback: "Une erreur est survenue, veuillez réessayer.",
   },
   es: {
+    transcribeButton: "Transcribir audio/video",
+    transcribingButton: "Transcribiendo…",
+    transcribeHint: "MP3, MP4, WAV o M4A — hasta 25 MB",
+    transcribeErrorFallback: "No se pudo transcribir ese archivo. Inténtalo de nuevo.",
     appTitle: "Repurpose",
     appTagline: "Una transcripción. Todos los formatos.",
     sourceContentTitle: "Contenido de origen",
@@ -195,6 +215,10 @@ const TRANSLATIONS: Record<UILanguage, Translations> = {
     contactErrorFallback: "Algo salió mal, inténtalo de nuevo.",
   },
   tr: {
+    transcribeButton: "Ses/video deşifre et",
+    transcribingButton: "Deşifre ediliyor…",
+    transcribeHint: "MP3, MP4, WAV veya M4A — 25MB'a kadar",
+    transcribeErrorFallback: "Bu dosya deşifre edilemedi. Lütfen tekrar deneyin.",
     appTitle: "Repurpose",
     appTagline: "Bir metin. Her formatta çıktı.",
     sourceContentTitle: "Kaynak içerik",
@@ -230,6 +254,10 @@ const TRANSLATIONS: Record<UILanguage, Translations> = {
     contactErrorFallback: "Bir şeyler ters gitti, lütfen tekrar deneyin.",
   },
   ur: {
+    transcribeButton: "آڈیو/ویڈیو تفریغ کریں",
+    transcribingButton: "تفریغ ہو رہا ہے…",
+    transcribeHint: "MP3، MP4، WAV، یا M4A — 25MB تک",
+    transcribeErrorFallback: "اس فائل کو تفریغ نہیں کیا جا سکا۔ دوبارہ کوشش کریں۔",
     appTitle: "Repurpose",
     appTagline: "ایک متن، ہر فارمیٹ میں۔",
     sourceContentTitle: "ماخذ مواد",
@@ -265,6 +293,10 @@ const TRANSLATIONS: Record<UILanguage, Translations> = {
     contactErrorFallback: "کچھ غلط ہو گیا، براہ کرم دوبارہ کوشش کریں۔",
   },
   hi: {
+    transcribeButton: "ऑडियो/वीडियो ट्रांसक्राइब करें",
+    transcribingButton: "ट्रांसक्राइब हो रहा है…",
+    transcribeHint: "MP3, MP4, WAV, या M4A — 25MB तक",
+    transcribeErrorFallback: "उस फ़ाइल को ट्रांसक्राइब नहीं किया जा सका। कृपया फिर से कोशिश करें।",
     appTitle: "Repurpose",
     appTagline: "एक टेक्स्ट, हर फ़ॉर्मैट में।",
     sourceContentTitle: "स्रोत सामग्री",
@@ -300,6 +332,10 @@ const TRANSLATIONS: Record<UILanguage, Translations> = {
     contactErrorFallback: "कुछ गलत हो गया, कृपया फिर से कोशिश करें।",
   },
   de: {
+    transcribeButton: "Audio/Video transkribieren",
+    transcribingButton: "Wird transkribiert…",
+    transcribeHint: "MP3, MP4, WAV oder M4A — bis zu 25MB",
+    transcribeErrorFallback: "Diese Datei konnte nicht transkribiert werden. Bitte versuchen Sie es erneut.",
     appTitle: "Repurpose",
     appTagline: "Ein Text. Jedes Format.",
     sourceContentTitle: "Quellinhalt",
