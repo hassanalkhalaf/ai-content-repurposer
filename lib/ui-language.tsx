@@ -25,6 +25,7 @@ interface Translations {
   textareaPlaceholder: string;
   outputFormatLabel: string;
   outputLanguageLabel: string;
+  sameAsSourceLanguage: string;
   siteLanguageLabel: string;
   repurposeButton: string;
   repurposingButton: string;
@@ -61,6 +62,7 @@ const TRANSLATIONS: Record<UILanguage, Translations> = {
     textareaPlaceholder: "Paste your transcript or long-form text here…",
     outputFormatLabel: "Output format",
     outputLanguageLabel: "Output language",
+    sameAsSourceLanguage: "Same as source text",
     siteLanguageLabel: "Site language",
     repurposeButton: "Repurpose Content",
     repurposingButton: "Repurposing…",
@@ -95,6 +97,7 @@ const TRANSLATIONS: Record<UILanguage, Translations> = {
     textareaPlaceholder: "الصق نصك أو المحتوى الطويل هنا…",
     outputFormatLabel: "صيغة الإخراج",
     outputLanguageLabel: "لغة المخرجات",
+    sameAsSourceLanguage: "نفس لغة النص",
     siteLanguageLabel: "لغة الموقع",
     repurposeButton: "أعد الصياغة",
     repurposingButton: "جارِ إعادة الصياغة…",
@@ -129,6 +132,7 @@ const TRANSLATIONS: Record<UILanguage, Translations> = {
     textareaPlaceholder: "Collez votre transcription ou texte ici…",
     outputFormatLabel: "Format de sortie",
     outputLanguageLabel: "Langue de sortie",
+    sameAsSourceLanguage: "Comme le texte source",
     siteLanguageLabel: "Langue du site",
     repurposeButton: "Générer le contenu",
     repurposingButton: "Génération en cours…",
@@ -163,6 +167,7 @@ const TRANSLATIONS: Record<UILanguage, Translations> = {
     textareaPlaceholder: "Pega tu transcripción o texto aquí…",
     outputFormatLabel: "Formato de salida",
     outputLanguageLabel: "Idioma de salida",
+    sameAsSourceLanguage: "Igual que el texto de origen",
     siteLanguageLabel: "Idioma del sitio",
     repurposeButton: "Generar contenido",
     repurposingButton: "Generando…",
@@ -197,6 +202,7 @@ const TRANSLATIONS: Record<UILanguage, Translations> = {
     textareaPlaceholder: "Metninizi veya uzun içeriğinizi buraya yapıştırın…",
     outputFormatLabel: "Çıktı formatı",
     outputLanguageLabel: "Çıktı dili",
+    sameAsSourceLanguage: "Kaynak metinle aynı",
     siteLanguageLabel: "Site dili",
     repurposeButton: "İçeriği Oluştur",
     repurposingButton: "Oluşturuluyor…",
@@ -231,6 +237,7 @@ const TRANSLATIONS: Record<UILanguage, Translations> = {
     textareaPlaceholder: "اپنا متن یہاں چسپاں کریں…",
     outputFormatLabel: "آؤٹ پٹ فارمیٹ",
     outputLanguageLabel: "آؤٹ پٹ زبان",
+    sameAsSourceLanguage: "ماخذ متن جیسی",
     siteLanguageLabel: "سائٹ کی زبان",
     repurposeButton: "مواد تیار کریں",
     repurposingButton: "تیار ہو رہا ہے…",
@@ -265,6 +272,7 @@ const TRANSLATIONS: Record<UILanguage, Translations> = {
     textareaPlaceholder: "अपना टेक्स्ट यहाँ पेस्ट करें…",
     outputFormatLabel: "आउटपुट फ़ॉर्मैट",
     outputLanguageLabel: "आउटपुट भाषा",
+    sameAsSourceLanguage: "स्रोत टेक्स्ट जैसी",
     siteLanguageLabel: "साइट की भाषा",
     repurposeButton: "सामग्री बनाएं",
     repurposingButton: "बनाया जा रहा है…",
@@ -299,6 +307,7 @@ const TRANSLATIONS: Record<UILanguage, Translations> = {
     textareaPlaceholder: "Fügen Sie hier Ihren Text ein…",
     outputFormatLabel: "Ausgabeformat",
     outputLanguageLabel: "Ausgabesprache",
+    sameAsSourceLanguage: "Wie der Quelltext",
     siteLanguageLabel: "Sprache der Seite",
     repurposeButton: "Inhalt erstellen",
     repurposingButton: "Wird erstellt…",
