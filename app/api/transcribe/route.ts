@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
+import { del } from "@vercel/blob";
 
 export const maxDuration = 60;
 
-// OpenAI's Whisper endpoint itself hard-caps uploads at 25MB per file, so we
-// enforce the same limit here rather than inventing our own — anything
-// larger will be rejected by the provider anyway.
+// This mirrors OpenAI Whisper's own 25MB hard limit per file. It's enforced
+// again here (in addition to at Blob-upload time) as a second safety net.
 const MAX_FILE_SIZE_BYTES = 25 * 1024 * 1024;
 
 export async function POST(req: NextRequest) {
@@ -16,26 +16,53 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  let formData: FormData;
+  let body: { blobUrl?: string; fileName?: string };
   try {
-    formData = await req.formData();
+    body = await req.json();
   } catch {
-    return NextResponse.json({ error: "Invalid upload." }, { status: 400 });
+    return NextResponse.json({ error: "Invalid request." }, { status: 400 });
   }
 
-  const file = formData.get("file");
-  if (!(file instanceof File)) {
+  const { blobUrl, fileName } = body;
+  if (typeof blobUrl !== "string" || blobUrl.trim().length === 0) {
     return NextResponse.json(
-      { error: "Please attach an audio or video file." },
+      { error: "Missing uploaded file reference." },
       { status: 400 }
     );
   }
 
-  if (file.size === 0) {
+  const blobToken = process.env.BLOB_READ_WRITE_TOKEN;
+
+  let fileBuffer: ArrayBuffer;
+  let contentType: string;
+  try {
+    const blobResponse = await fetch(blobUrl, {
+      headers: blobToken ? { Authorization: "Bearer " + blobToken } : {},
+    });
+
+    if (!blobResponse.ok) {
+      return NextResponse.json(
+        { error: "Could not retrieve the uploaded file. Please try uploading again." },
+        { status: 502 }
+      );
+    }
+
+    contentType = blobResponse.headers.get("content-type") ?? "application/octet-stream";
+    fileBuffer = await blobResponse.arrayBuffer();
+  } catch {
+    return NextResponse.json(
+      { error: "Could not retrieve the uploaded file. Please try uploading again." },
+      { status: 502 }
+    );
+  }
+
+  if (fileBuffer.byteLength === 0) {
+    await safeDeleteBlob(blobUrl);
     return NextResponse.json({ error: "The uploaded file is empty." }, { status: 400 });
   }
 
-  if (file.size > MAX_FILE_SIZE_BYTES) {
+  if (fileBuffer.byteLength > MAX_FILE_SIZE_BYTES) {
+    await safeDeleteBlob(blobUrl);
     return NextResponse.json(
       { error: "That file is too large — please keep it under 25MB." },
       { status: 400 }
@@ -43,7 +70,8 @@ export async function POST(req: NextRequest) {
   }
 
   const upstreamForm = new FormData();
-  upstreamForm.append("file", file, file.name);
+  const fileBlob = new Blob([fileBuffer], { type: contentType });
+  upstreamForm.append("file", fileBlob, fileName || "audio");
   upstreamForm.append("model", "whisper-1");
 
   const controller = new AbortController();
@@ -63,8 +91,8 @@ export async function POST(req: NextRequest) {
       const status = response.status;
       let detail = "";
       try {
-        const body = await response.json();
-        detail = body?.error?.message ?? "";
+        const errBody = await response.json();
+        detail = errBody?.error?.message ?? "";
       } catch {
       }
 
@@ -114,6 +142,3 @@ export async function POST(req: NextRequest) {
       { status: 502 }
     );
   } finally {
-    clearTimeout(timeout);
-  }
-}
