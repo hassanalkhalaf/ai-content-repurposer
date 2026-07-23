@@ -14,10 +14,10 @@ const ANTHROPIC_MODEL = "claude-sonnet-4-5-20250929";
 const REQUEST_TIMEOUT_MS = 55000;
 
 const MAX_TOKENS_BY_FORMAT: Record<OutputFormat, number> = {
-  twitter: 900,
-  linkedin: 900,
-  blog: 1400,
-  instagram: 700,
+  twitter: 1300,
+  linkedin: 1300,
+  blog: 2200,
+  instagram: 1100,
 };
 
 export class LlmError extends Error {
