@@ -68,4 +68,4 @@ export const LANGUAGE_NAMES_FOR_PROMPT: Record<Exclude<TargetLanguage, "auto">, 
 };
 
 export const MIN_TRANSCRIPT_LENGTH = 40;
-export const MAX_TRANSCRIPT_LENGTH = 20000;
+export const MAX_TRANSCRIPT_LENGTH = 50000;
