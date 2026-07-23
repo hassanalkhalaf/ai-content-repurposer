@@ -5,6 +5,7 @@ import { Sparkles, Loader2, TriangleAlert, Wand2, Globe, Mic } from "lucide-reac
 import FormatSelector from "@/components/FormatSelector";
 import LanguageSelector from "@/components/LanguageSelector";
 import OutputCard from "@/components/OutputCard";
+import { upload } from "@vercel/blob/client";
 import { useUILanguage, UILanguage, UI_LANGUAGE_NATIVE_NAMES } from "@/lib/ui-language";
 import {
   MAX_TRANSCRIPT_LENGTH,
@@ -86,12 +87,21 @@ export default function DashboardPage() {
     setTranscribeError(null);
 
     try {
-      const formData = new FormData();
-      formData.append("file", file);
+      // Step 1: upload the file directly from the browser to Vercel Blob
+      // storage, bypassing our server's 4.5MB request body limit entirely
+      // — the file bytes never pass through our serverless function.
+      const blob = await upload(file.name, file, {
+        access: "private",
+        handleUploadUrl: "/api/blob-upload",
+      });
 
+      // Step 2: hand the resulting Blob URL (not the file itself) to our
+      // transcribe route, which fetches it server-to-server and forwards
+      // it to the transcription provider.
       const res = await fetch("/api/transcribe", {
         method: "POST",
-        body: formData,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ blobUrl: blob.url, fileName: file.name }),
       });
 
       const body = await res.json().catch(() => null);
