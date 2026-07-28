@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
 import { createSupabaseAdminClient } from "@/lib/supabase-admin";
 
-// Lemon Squeezy Variant IDs → subscription tier + word quota
 const VARIANT_TIER_MAP: Record<string, { tier: "starter" | "pro"; wordsLimit: number }> = {
   "1949636": { tier: "starter", wordsLimit: 50000 },
   "1949667": { tier: "pro", wordsLimit: 200000 },
@@ -22,7 +21,6 @@ function verifySignature(rawBody: string, signatureHeader: string | null, secret
 export async function POST(req: NextRequest) {
   const secret = process.env.LEMON_SQUEEZY_WEBHOOK_SECRET;
   if (!secret) {
-    console.error("Server is missing LEMON_SQUEEZY_WEBHOOK_SECRET.");
     return NextResponse.json({ error: "Server misconfigured." }, { status: 500 });
   }
 
@@ -30,7 +28,6 @@ export async function POST(req: NextRequest) {
   const signatureHeader = req.headers.get("x-signature");
 
   if (!verifySignature(rawBody, signatureHeader, secret)) {
-    console.error("Invalid Lemon Squeezy webhook signature.");
     return NextResponse.json({ error: "Invalid signature." }, { status: 401 });
   }
 
@@ -42,88 +39,90 @@ export async function POST(req: NextRequest) {
   }
 
   const eventName: string | undefined = payload?.meta?.event_name;
-  const customData = payload?.meta?.custom_data ?? {};
-  const supabaseUserId: string | undefined = customData?.user_id;
+  const supabaseUserId: string | undefined = payload?.meta?.custom_data?.user_id;
 
   const attributes = payload?.data?.attributes ?? {};
-  const customerId: string | number | undefined = attributes?.customer_id;
+  const customerId = attributes?.customer_id;
   const variantId: string | undefined = attributes?.variant_id?.toString();
-  const subscriptionId: string | number | undefined = payload?.data?.id;
+  const subscriptionId = payload?.data?.id;
   const renewsAt: string | undefined = attributes?.renews_at;
   const endsAt: string | undefined = attributes?.ends_at;
   const status: string | undefined = attributes?.status;
 
+  // Diagnostics echoed back in the response so we can see what happened
+  // without needing access to server logs.
+  const debug: Record<string, unknown> = {
+    eventName,
+    supabaseUserId: supabaseUserId ?? null,
+    variantId: variantId ?? null,
+    status: status ?? null,
+  };
+
   const supabase = createSupabaseAdminClient();
 
   try {
-    switch (eventName) {
-      case "subscription_created":
-      case "subscription_updated": {
-        const tierInfo = variantId && VARIANT_TIER_MAP[variantId] ? VARIANT_TIER_MAP[variantId] : FREE_TIER;
+    if (
+      eventName === "subscription_created" ||
+      eventName === "subscription_updated" ||
+      eventName === "subscription_cancelled"
+    ) {
+      const identifierColumn = supabaseUserId ? "id" : "lemon_squeezy_customer_id";
+      const identifierValue = supabaseUserId ?? customerId;
 
-        const updatePayload = {
-          subscription_tier: tierInfo.tier,
-          subscription_status: status ?? null,
-          lemon_squeezy_customer_id: customerId ?? null,
-          lemon_squeezy_subscription_id: subscriptionId ?? null,
-          words_limit: tierInfo.wordsLimit,
-          renews_at: renewsAt ?? null,
-          ends_at: endsAt ?? null,
-        };
-
-        const identifier = supabaseUserId
-          ? { column: "id", value: supabaseUserId }
-          : { column: "lemon_squeezy_customer_id", value: customerId };
-
-        if (!identifier.value) {
-          console.error("Webhook had no way to identify the Supabase user.");
-          return NextResponse.json({ received: true, warning: "No user identifier" }, { status: 200 });
-        }
-
-        const { error } = await supabase
-          .from("profiles")
-          .update(updatePayload)
-          .eq(identifier.column, identifier.value);
-
-        if (error) {
-          console.error("Failed to update profile from webhook:", error);
-          return NextResponse.json({ error: "Database update failed." }, { status: 500 });
-        }
-        break;
+      if (!identifierValue) {
+        return NextResponse.json(
+          { received: true, debug: { ...debug, problem: "no identifier" } },
+          { status: 200 }
+        );
       }
 
-      case "subscription_cancelled": {
-        const identifier = supabaseUserId
-          ? { column: "id", value: supabaseUserId }
-          : { column: "lemon_squeezy_customer_id", value: customerId };
+      // Confirm the row actually exists before updating.
+      const { data: existing, error: findError } = await supabase
+        .from("profiles")
+        .select("id, email, subscription_tier")
+        .eq(identifierColumn, identifierValue);
 
-        if (!identifier.value) {
-          return NextResponse.json({ received: true, warning: "No user identifier" }, { status: 200 });
-        }
+      debug.lookupError = findError?.message ?? null;
+      debug.rowsFound = existing?.length ?? 0;
 
-        const { error } = await supabase
-          .from("profiles")
-          .update({
-            subscription_tier: FREE_TIER.tier,
-            subscription_status: "cancelled",
-            words_limit: FREE_TIER.wordsLimit,
-          })
-          .eq(identifier.column, identifier.value);
+      const updatePayload =
+        eventName === "subscription_cancelled"
+          ? {
+              subscription_tier: FREE_TIER.tier,
+              subscription_status: "cancelled",
+              words_limit: FREE_TIER.wordsLimit,
+            }
+          : {
+              subscription_tier:
+                variantId && VARIANT_TIER_MAP[variantId]
+                  ? VARIANT_TIER_MAP[variantId].tier
+                  : FREE_TIER.tier,
+              subscription_status: status ?? null,
+              lemon_squeezy_customer_id: customerId ? String(customerId) : null,
+              lemon_squeezy_subscription_id: subscriptionId ? String(subscriptionId) : null,
+              words_limit:
+                variantId && VARIANT_TIER_MAP[variantId]
+                  ? VARIANT_TIER_MAP[variantId].wordsLimit
+                  : FREE_TIER.wordsLimit,
+              renews_at: renewsAt ?? null,
+              ends_at: endsAt ?? null,
+            };
 
-        if (error) {
-          console.error("Failed to downgrade profile from webhook:", error);
-          return NextResponse.json({ error: "Database update failed." }, { status: 500 });
-        }
-        break;
-      }
+      const { data: updated, error: updateError } = await supabase
+        .from("profiles")
+        .update(updatePayload)
+        .eq(identifierColumn, identifierValue)
+        .select("id, subscription_tier, words_limit");
 
-      default:
-        break;
+      debug.updateError = updateError?.message ?? null;
+      debug.rowsUpdated = updated?.length ?? 0;
     }
 
-    return NextResponse.json({ received: true }, { status: 200 });
-  } catch (err) {
-    console.error("Unexpected Lemon Squeezy webhook error:", err);
-    return NextResponse.json({ error: "Internal error." }, { status: 500 });
+    return NextResponse.json({ received: true, debug }, { status: 200 });
+  } catch (err: any) {
+    return NextResponse.json(
+      { received: true, debug: { ...debug, thrown: err?.message ?? String(err) } },
+      { status: 200 }
+    );
   }
 }
