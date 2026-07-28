@@ -1,11 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { del } from "@vercel/blob";
+import { createSupabaseServerClient } from "@/lib/supabase-server";
+import { createSupabaseAdminClient } from "@/lib/supabase-admin";
 
 export const maxDuration = 60;
 
 // This mirrors OpenAI Whisper's own 25MB hard limit per file. It's enforced
 // again here (in addition to at Blob-upload time) as a second safety net.
 const MAX_FILE_SIZE_BYTES = 25 * 1024 * 1024;
+
+// Transcription costs real money per minute of audio, so it's a paid feature.
+const PAID_TIERS = ["starter", "pro"];
 
 export async function POST(req: NextRequest) {
   const apiKey = process.env.OPENAI_API_KEY;
@@ -28,6 +33,48 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(
       { error: "Missing uploaded file reference." },
       { status: 400 }
+    );
+  }
+
+  // --- Auth ---
+  const supabase = createSupabaseServerClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    await safeDeleteBlob(blobUrl);
+    return NextResponse.json(
+      { error: "Please sign in to transcribe audio.", code: "unauthenticated" },
+      { status: 401 }
+    );
+  }
+
+  // --- Plan gate ---
+  const admin = createSupabaseAdminClient();
+  const { data: profile, error: profileError } = await admin
+    .from("profiles")
+    .select("subscription_tier")
+    .eq("id", user.id)
+    .single();
+
+  if (profileError || !profile) {
+    await safeDeleteBlob(blobUrl);
+    return NextResponse.json(
+      { error: "Could not verify your account. Please try again." },
+      { status: 500 }
+    );
+  }
+
+  if (!PAID_TIERS.includes(profile.subscription_tier)) {
+    await safeDeleteBlob(blobUrl);
+    return NextResponse.json(
+      {
+        error: "Audio and video transcription is available on the Starter and Pro plans.",
+        code: "upgrade_required",
+        tier: profile.subscription_tier,
+      },
+      { status: 402 }
     );
   }
 
