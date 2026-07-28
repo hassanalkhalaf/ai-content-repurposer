@@ -5,6 +5,7 @@ import { Sparkles, Loader2, TriangleAlert, Wand2, Globe, Mic } from "lucide-reac
 import FormatSelector from "@/components/FormatSelector";
 import LanguageSelector from "@/components/LanguageSelector";
 import OutputCard from "@/components/OutputCard";
+import AccountBar from "@/components/AccountBar";
 import { upload } from "@vercel/blob/client";
 import { useUILanguage, UILanguage, UI_LANGUAGE_NATIVE_NAMES } from "@/lib/ui-language";
 import {
@@ -248,7 +249,7 @@ export default function DashboardPage() {
 function Header() {
   const { t, lang, setLang } = useUILanguage();
   return (
-    <header className="flex items-center justify-between gap-3">
+    <header className="flex flex-wrap items-center justify-between gap-3">
       <div className="flex items-center gap-3">
         <div className="flex h-10 w-10 items-center justify-center rounded-full bg-ink text-paper">
           <Wand2 size={18} />
@@ -258,20 +259,25 @@ function Header() {
           <p className="text-sm text-ink-soft">{t.appTagline}</p>
         </div>
       </div>
-      <div className="flex items-center gap-1.5 rounded-full border border-line bg-panel px-3 py-1.5">
-        <Globe size={15} strokeWidth={2} className="shrink-0 text-ink-faint" />
-        <select
-          aria-label={t.siteLanguageLabel}
-          value={lang}
-          onChange={(e) => setLang(e.target.value as UILanguage)}
-          className="focus-ring bg-transparent text-sm font-medium text-ink-soft"
-        >
-          {UI_LANGUAGE_ORDER.map((code) => (
-            <option key={code} value={code}>
-              {UI_LANGUAGE_NATIVE_NAMES[code]}
-            </option>
-          ))}
-        </select>
+
+      <div className="flex flex-wrap items-center gap-2">
+        <AccountBar />
+
+        <div className="flex items-center gap-1.5 rounded-full border border-line bg-panel px-3 py-1.5">
+          <Globe size={15} strokeWidth={2} className="shrink-0 text-ink-faint" />
+          <select
+            aria-label={t.siteLanguageLabel}
+            value={lang}
+            onChange={(e) => setLang(e.target.value as UILanguage)}
+            className="focus-ring bg-transparent text-sm font-medium text-ink-soft"
+          >
+            {UI_LANGUAGE_ORDER.map((code) => (
+              <option key={code} value={code}>
+                {UI_LANGUAGE_NATIVE_NAMES[code]}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
     </header>
   );
