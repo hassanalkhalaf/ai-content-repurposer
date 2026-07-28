@@ -380,13 +380,40 @@ interface UILanguageContextValue {
 
 const UILanguageContext = createContext<UILanguageContextValue | null>(null);
 
+const UI_LANGUAGE_STORAGE_KEY = "repurpose.ui-language";
+
 export function UILanguageProvider({ children }: { children: ReactNode }) {
+  const [hydrated, setHydrated] = useState(false);
   const [lang, setLang] = useState<UILanguage>("en");
 
   useEffect(() => {
     document.documentElement.lang = lang;
     document.documentElement.dir = RTL_LANGUAGES.includes(lang) ? "rtl" : "ltr";
   }, [lang]);
+
+  // Restore the visitor's saved language once, on mount.
+  useEffect(() => {
+    if (hydrated) return;
+    setHydrated(true);
+    try {
+      const stored = window.localStorage.getItem(UI_LANGUAGE_STORAGE_KEY);
+      if (stored && stored !== lang && stored in TRANSLATIONS) {
+        setLang(stored as UILanguage);
+      }
+    } catch {
+      // localStorage can be unavailable (private mode / blocked storage).
+    }
+  }, [hydrated, lang]);
+
+  // Persist every later change so the choice survives a reload.
+  useEffect(() => {
+    if (!hydrated) return;
+    try {
+      window.localStorage.setItem(UI_LANGUAGE_STORAGE_KEY, lang);
+    } catch {
+      // Ignore write failures; the choice still applies for this session.
+    }
+  }, [hydrated, lang]);
 
   return (
     <UILanguageContext.Provider value={{ lang, t: TRANSLATIONS[lang], setLang }}>
