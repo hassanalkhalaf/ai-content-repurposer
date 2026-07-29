@@ -33,7 +33,7 @@ export async function checkQuota(userId: string, inputWords: number) {
   }
 
   const wordsUsed = profile.words_used ?? 0;
-  const wordsLimit = profile.words_limit ?? 5000;
+  const wordsLimit = profile.words_limit ?? 15000;
 
   if (wordsUsed + inputWords > wordsLimit) {
     throw new QuotaExceededError(wordsUsed, wordsLimit);
