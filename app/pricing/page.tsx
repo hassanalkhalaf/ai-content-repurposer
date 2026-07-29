@@ -27,7 +27,7 @@ const COPY: Record<string, any> = {
     footer: "Cancel any time. Payments are processed securely by Lemon Squeezy.",
     free: {
       name: "Free",
-      words: "5,000 words per month",
+      words: "15,000 words per month",
       features: [
         "Turn text into threads, LinkedIn posts, captions and articles",
         "Interface available in 8 languages",
@@ -60,7 +60,7 @@ const COPY: Record<string, any> = {
     footer: "يمكنك الإلغاء في أي وقت. الدفع يتم عبر Lemon Squeezy بشكل آمن.",
     free: {
       name: "مجاني",
-      words: "5,000 كلمة شهريًا",
+      words: "15,000 كلمة شهريًا",
       features: [
         "تحويل النصوص لتويتر ولينكدإن وإنستقرام ومقالات",
         "الواجهة متوفرة بثماني لغات",
@@ -94,7 +94,7 @@ const COPY: Record<string, any> = {
       "Annulable à tout moment. Paiements traités en toute sécurité par Lemon Squeezy.",
     free: {
       name: "Gratuit",
-      words: "5 000 mots par mois",
+      words: "15 000 mots par mois",
       features: [
         "Transformez un texte en fils, posts LinkedIn, légendes et articles",
         "Interface disponible en 8 langues",
@@ -132,7 +132,7 @@ const COPY: Record<string, any> = {
       "Cancela cuando quieras. Los pagos los procesa Lemon Squeezy de forma segura.",
     free: {
       name: "Gratis",
-      words: "5.000 palabras al mes",
+      words: "15.000 palabras al mes",
       features: [
         "Convierte texto en hilos, publicaciones de LinkedIn, pies de foto y artículos",
         "Interfaz disponible en 8 idiomas",
@@ -170,7 +170,7 @@ const COPY: Record<string, any> = {
       "İstediğiniz zaman iptal edin. Ödemeler Lemon Squeezy tarafından güvenle işlenir.",
     free: {
       name: "Ücretsiz",
-      words: "Ayda 5.000 kelime",
+      words: "Ayda 15.000 kelime",
       features: [
         "Metni thread, LinkedIn gönderisi, açıklama ve makaleye dönüştürün",
         "Arayüz 8 dilde mevcut",
@@ -204,7 +204,7 @@ const COPY: Record<string, any> = {
       "کسی بھی وقت منسوخ کریں۔ ادائیگیاں Lemon Squeezy کے ذریعے محفوظ طریقے سے ہوتی ہیں۔",
     free: {
       name: "مفت",
-      words: "ماہانہ 5,000 الفاظ",
+      words: "ماہانہ 15,000 الفاظ",
       features: [
         "متن کو تھریڈ، لنکڈاِن پوسٹ، کیپشن اور مضمون میں تبدیل کریں",
         "انٹرفیس آٹھ زبانوں میں دستیاب",
@@ -238,7 +238,7 @@ const COPY: Record<string, any> = {
       "कभी भी रद्द करें। भुगतान Lemon Squeezy द्वारा सुरक्षित रूप से संसाधित होते हैं।",
     free: {
       name: "मुफ़्त",
-      words: "हर महीने 5,000 शब्द",
+      words: "हर महीने 15,000 शब्द",
       features: [
         "टेक्स्ट को थ्रेड, लिंक्डइन पोस्ट, कैप्शन और लेख में बदलें",
         "इंटरफ़ेस आठ भाषाओं में उपलब्ध",
@@ -276,7 +276,7 @@ const COPY: Record<string, any> = {
       "Jederzeit kündbar. Zahlungen werden sicher über Lemon Squeezy abgewickelt.",
     free: {
       name: "Kostenlos",
-      words: "5.000 Wörter pro Monat",
+      words: "15.000 Wörter pro Monat",
       features: [
         "Text in Threads, LinkedIn-Posts, Captions und Artikel verwandeln",
         "Oberfläche in 8 Sprachen verfügbar",
