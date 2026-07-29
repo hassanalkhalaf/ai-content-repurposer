@@ -29,6 +29,7 @@ interface Translations {
   transcribeButton: string;
   transcribingButton: string;
   transcribeHint: string;
+  fileTooLarge: string;
   transcribeErrorFallback: string;
   siteLanguageLabel: string;
   repurposeButton: string;
@@ -61,7 +62,8 @@ const TRANSLATIONS: Record<UILanguage, Translations> = {
   en: {
     transcribeButton: "Transcribe audio/video",
     transcribingButton: "Transcribing…",
-    transcribeHint: "MP3, MP4, WAV, or M4A — up to 25MB",
+    transcribeHint: "MP3, MP4, WAV, or M4A — up to 25MB (about 20 minutes of audio)",
+    fileTooLarge: "That file is too large. The limit is 25MB, about 20 minutes of audio. For video, extract the audio track first.",
     transcribeErrorFallback: "Could not transcribe that file. Please try again.",
     appTitle: "Repurpose",
     appTagline: "One transcript in. Every format out.",
@@ -100,7 +102,8 @@ const TRANSLATIONS: Record<UILanguage, Translations> = {
   ar: {
     transcribeButton: "تفريغ صوت/فيديو",
     transcribingButton: "جارِ التفريغ…",
-    transcribeHint: "MP3، MP4، WAV، أو M4A — حتى 25 ميجابايت",
+    transcribeHint: "MP3 أو MP4 أو WAV أو M4A — حتى 25 ميجا (نحو 20 دقيقة صوت)",
+    fileTooLarge: "الملف كبير جدًا. الحد 25 ميجا، أي نحو 20 دقيقة صوت. إذا كان فيديو، استخرج الصوت منه أولاً.",
     transcribeErrorFallback: "تعذّر تفريغ هذا الملف. حاول مرة أخرى.",
     appTitle: "Repurpose",
     appTagline: "من نص واحد... لكل الصيغ.",
@@ -139,7 +142,8 @@ const TRANSLATIONS: Record<UILanguage, Translations> = {
   fr: {
     transcribeButton: "Transcrire audio/vidéo",
     transcribingButton: "Transcription en cours…",
-    transcribeHint: "MP3, MP4, WAV ou M4A — jusqu'à 25 Mo",
+    transcribeHint: "MP3, MP4, WAV ou M4A — jusqu'à 25 Mo (environ 20 min d'audio)",
+    fileTooLarge: "Ce fichier est trop volumineux. La limite est de 25 Mo, environ 20 minutes d'audio. Pour une vidéo, extrayez d'abord la piste audio.",
     transcribeErrorFallback: "Impossible de transcrire ce fichier. Veuillez réessayer.",
     appTitle: "Repurpose",
     appTagline: "Une transcription. Tous les formats.",
@@ -178,7 +182,8 @@ const TRANSLATIONS: Record<UILanguage, Translations> = {
   es: {
     transcribeButton: "Transcribir audio/video",
     transcribingButton: "Transcribiendo…",
-    transcribeHint: "MP3, MP4, WAV o M4A — hasta 25 MB",
+    transcribeHint: "MP3, MP4, WAV o M4A — hasta 25 MB (unos 20 min de audio)",
+    fileTooLarge: "El archivo es demasiado grande. El límite es 25 MB, unos 20 minutos de audio. Para vídeo, extrae primero el audio.",
     transcribeErrorFallback: "No se pudo transcribir ese archivo. Inténtalo de nuevo.",
     appTitle: "Repurpose",
     appTagline: "Una transcripción. Todos los formatos.",
@@ -217,7 +222,8 @@ const TRANSLATIONS: Record<UILanguage, Translations> = {
   tr: {
     transcribeButton: "Ses/video deşifre et",
     transcribingButton: "Deşifre ediliyor…",
-    transcribeHint: "MP3, MP4, WAV veya M4A — 25MB'a kadar",
+    transcribeHint: "MP3, MP4, WAV veya M4A — 25MB'a kadar (yaklaşık 20 dk ses)",
+    fileTooLarge: "Bu dosya çok büyük. Sınır 25MB, yaklaşık 20 dakika ses. Video için önce ses parçasını ayıklayın.",
     transcribeErrorFallback: "Bu dosya deşifre edilemedi. Lütfen tekrar deneyin.",
     appTitle: "Repurpose",
     appTagline: "Bir metin. Her formatta çıktı.",
@@ -256,7 +262,8 @@ const TRANSLATIONS: Record<UILanguage, Translations> = {
   ur: {
     transcribeButton: "آڈیو/ویڈیو تفریغ کریں",
     transcribingButton: "تفریغ ہو رہا ہے…",
-    transcribeHint: "MP3، MP4، WAV، یا M4A — 25MB تک",
+    transcribeHint: "MP3، MP4، WAV، یا M4A — 25MB تک (تقریباً 20 منٹ آڈیو)",
+    fileTooLarge: "یہ فائل بہت بڑی ہے۔ حد 25MB ہے، تقریباً 20 منٹ آڈیو۔ ویڈیو کے لیے پہلے آڈیو نکالیں۔",
     transcribeErrorFallback: "اس فائل کو تفریغ نہیں کیا جا سکا۔ دوبارہ کوشش کریں۔",
     appTitle: "Repurpose",
     appTagline: "ایک متن، ہر فارمیٹ میں۔",
@@ -295,7 +302,8 @@ const TRANSLATIONS: Record<UILanguage, Translations> = {
   hi: {
     transcribeButton: "ऑडियो/वीडियो ट्रांसक्राइब करें",
     transcribingButton: "ट्रांसक्राइब हो रहा है…",
-    transcribeHint: "MP3, MP4, WAV, या M4A — 25MB तक",
+    transcribeHint: "MP3, MP4, WAV, या M4A — 25MB तक (लगभग 20 मिनट ऑडियो)",
+    fileTooLarge: "यह फ़ाइल बहुत बड़ी है। सीमा 25MB है, लगभग 20 मिनट ऑडियो। वीडियो के लिए पहले ऑडियो निकालें।",
     transcribeErrorFallback: "उस फ़ाइल को ट्रांसक्राइब नहीं किया जा सका। कृपया फिर से कोशिश करें।",
     appTitle: "Repurpose",
     appTagline: "एक टेक्स्ट, हर फ़ॉर्मैट में।",
@@ -334,7 +342,8 @@ const TRANSLATIONS: Record<UILanguage, Translations> = {
   de: {
     transcribeButton: "Audio/Video transkribieren",
     transcribingButton: "Wird transkribiert…",
-    transcribeHint: "MP3, MP4, WAV oder M4A — bis zu 25MB",
+    transcribeHint: "MP3, MP4, WAV oder M4A — bis zu 25 MB (etwa 20 Min. Audio)",
+    fileTooLarge: "Diese Datei ist zu groß. Das Limit liegt bei 25 MB, etwa 20 Minuten Audio. Extrahiere bei Videos zuerst die Tonspur.",
     transcribeErrorFallback: "Diese Datei konnte nicht transkribiert werden. Bitte versuchen Sie es erneut.",
     appTitle: "Repurpose",
     appTagline: "Ein Text. Jedes Format.",
