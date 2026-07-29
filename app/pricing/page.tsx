@@ -5,11 +5,9 @@ import { useRouter } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabase-browser";
 import { useUILanguage, UI_LANGUAGE_NATIVE_NAMES } from "@/lib/ui-language";
 
-const CHECKOUT_URLS = {
-  // Starter — $9.99/month
+const CHECKOUT_URLS: Record<"starter" | "pro", string> = {
   starter:
     "https://repurposerapp.lemonsqueezy.com/checkout/buy/5addba39-035b-4580-9584-c1a33fe57f0e",
-  // Pro — $19.99/month
   pro:
     "https://repurposerapp.lemonsqueezy.com/checkout/buy/610175fa-d9c2-47cd-a437-4491bbe026c7",
 };
@@ -38,7 +36,11 @@ const COPY: Record<string, any> = {
     starter: {
       name: "Starter",
       words: "50,000 words per month",
-      features: ["Everything in Free", "Audio and video transcription", "7-day free trial"],
+      features: [
+        "Everything in Free",
+        "Audio and video transcription",
+        "7-day free trial",
+      ],
     },
     pro: {
       name: "Pro",
@@ -67,7 +69,11 @@ const COPY: Record<string, any> = {
     starter: {
       name: "Starter",
       words: "50,000 كلمة شهريًا",
-      features: ["كل مزايا الباقة المجانية", "تفريغ الصوت والفيديو", "تجربة مجانية 7 أيام"],
+      features: [
+        "كل مزايا الباقة المجانية",
+        "تفريغ الصوت والفيديو",
+        "تجربة مجانية 7 أيام",
+      ],
     },
     pro: {
       name: "Pro",
@@ -331,8 +337,8 @@ export default function PricingPage() {
       router.push("/login");
       return;
     }
-    const url = `${CHECKOUT_URLS[plan]}?checkout[email]=${encodeURIComponent(email)}`;
-    window.location.href = url;
+    window.location.href =
+      CHECKOUT_URLS[plan] + "?checkout[email]=" + encodeURIComponent(email);
   }
 
   const plans = [
@@ -346,15 +352,13 @@ export default function PricingPage() {
       <div className="mx-auto max-w-5xl">
         <div className="mb-10 flex flex-wrap items-center justify-between gap-4">
           <a href="/" className="text-sm text-slate-500 transition hover:text-slate-900">
-            {dir === "rtl" ? "→" : "←"} {c.back}
+            {dir === "rtl" ? "\u2192" : "\u2190"} {c.back}
           </a>
 
           <select
             aria-label="Language"
             value={lang}
-            onChange={(e) =>
-              setLang(e.target.value as Parameters<typeof setLang>[0])
-            }
+            onChange={(e) => setLang(e.target.value as Parameters<typeof setLang>[0])}
             className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm text-slate-700 shadow-sm outline-none focus:border-slate-400"
           >
             {Object.entries(UI_LANGUAGE_NATIVE_NAMES).map(([code, name]) => (
@@ -374,9 +378,10 @@ export default function PricingPage() {
           {plans.map(({ key, price, copy, popular }) => (
             <div
               key={key}
-              className={`relative flex flex-col rounded-2xl border bg-white p-6 shadow-sm ${
-                popular ? "border-slate-900 shadow-md" : "border-slate-200"
-              }`}
+              className={
+                "relative flex flex-col rounded-2xl border bg-white p-6 shadow-sm " +
+                (popular ? "border-slate-900 shadow-md" : "border-slate-200")
+              }
             >
               {popular && (
                 <span className="absolute -top-3 rounded-full bg-slate-900 px-3 py-1 text-xs font-medium text-white">
@@ -397,7 +402,7 @@ export default function PricingPage() {
                 {copy.features.map((feature: string) => (
                   <li key={feature} className="flex gap-2 text-sm text-slate-700">
                     <span aria-hidden className="text-slate-400">
-                      ✓
+                      {"\u2713"}
                     </span>
                     <span>{feature}</span>
                   </li>
@@ -413,7 +418,7 @@ export default function PricingPage() {
                   <button
                     type="button"
                     disabled={!checked}
-                    onClick={() => goToPlan(key)}
+                    onClick={() => goToPlan(key as "starter" | "pro")}
                     className="w-full rounded-xl bg-slate-900 px-4 py-3 text-sm font-medium text-white transition hover:bg-slate-800 disabled:opacity-50"
                   >
                     {email ? c.upgrade : c.signIn}
