@@ -102,7 +102,7 @@ export async function POST(req: NextRequest) {
 
   const inputWords = countWords(transcript);
   const wordsUsed = profile.words_used ?? 0;
-  const wordsLimit = profile.words_limit ?? 5000;
+  const wordsLimit = profile.words_limit ?? 15000;
   const remaining = Math.max(wordsLimit - wordsUsed, 0);
 
   if (inputWords > remaining) {
