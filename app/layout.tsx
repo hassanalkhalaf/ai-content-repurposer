@@ -21,9 +21,9 @@ const mono = IBM_Plex_Mono({
   variable: "--font-mono",
 });
 
-const SITE_TITLE = "Repurpose — turn one transcript into every format";
+const SITE_TITLE = "Repurpose — حوّل نصاً واحداً إلى كل الصيغ";
 const SITE_DESCRIPTION =
-  "Paste a transcript or long-form text and generate a Twitter/X thread, LinkedIn post, or SEO blog article.";
+  "الصق تفريغ فيديو أو بودكاست أو أي نص طويل، واحصل على ثريد تويتر أو منشور لينكدإن أو مقال محسّن لمحركات البحث — بالعربية وسبع لغات أخرى.";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.repurpose.tools"),
@@ -39,6 +39,8 @@ export const metadata: Metadata = {
     siteName: "Repurpose",
     title: SITE_TITLE,
     description: SITE_DESCRIPTION,
+    locale: "ar_QA",
+    alternateLocale: ["en_US", "fr_FR", "es_ES", "tr_TR", "ur_PK", "hi_IN", "de_DE"],
   },
   twitter: {
     card: "summary_large_image",
@@ -53,7 +55,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="ar" dir="rtl">
       <body
         className={`${display.variable} ${body.variable} ${mono.variable} font-body bg-paper text-ink antialiased`}
       >
