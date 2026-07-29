@@ -4,11 +4,11 @@ import { createSupabaseAdminClient } from "@/lib/supabase-admin";
 
 // Lemon Squeezy Variant IDs → subscription tier + word quota
 const VARIANT_TIER_MAP: Record<string, { tier: "starter" | "pro"; wordsLimit: number }> = {
-  "1949636": { tier: "starter", wordsLimit: 50000 },
+  "1949636": { tier: "starter", wordsLimit: 150000 },
   "1949667": { tier: "pro", wordsLimit: 200000 },
 };
 
-const FREE_TIER = { tier: "free" as const, wordsLimit: 5000 };
+const FREE_TIER = { tier: "free" as const, wordsLimit: 15000 };
 
 function verifySignature(rawBody: string, signatureHeader: string | null, secret: string): boolean {
   if (!signatureHeader) return false;
