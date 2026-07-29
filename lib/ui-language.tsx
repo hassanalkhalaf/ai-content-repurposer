@@ -401,11 +401,11 @@ export function UILanguageProvider({ children }: { children: ReactNode }) {
         if (stored !== lang) setLang(stored as UILanguage);
         return;
       }
-      // No saved choice yet: follow the browser when we support it,
-      // and fall back to Arabic — our primary audience.
-      const browser = (navigator.language || "").slice(0, 2).toLowerCase();
-      const detected = browser in TRANSLATIONS ? browser : "ar";
-      if (detected !== lang) setLang(detected as UILanguage);
+      // No saved choice yet: always open in Arabic. Our audience is
+      // Arabic-speaking, and many of them keep their devices in English,
+      // so the browser locale is a poor signal here. Anyone else can
+      // switch once from the header and the choice is remembered.
+      if (lang !== "ar") setLang("ar" as UILanguage);
     } catch {
       // localStorage can be unavailable (private mode / blocked storage).
     }
