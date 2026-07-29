@@ -84,6 +84,15 @@ export default function DashboardPage() {
     e.target.value = "";
     if (!file) return;
 
+    // Reject oversized files before uploading anything. The transcription
+    // provider caps uploads at 25MB, so sending more would only waste the
+    // visitor's bandwidth and our blob storage before failing anyway.
+    if (file.size > 25 * 1024 * 1024) {
+      setTranscribeStatus("error");
+      setTranscribeError(t.fileTooLarge);
+      return;
+    }
+
     setTranscribeStatus("uploading");
     setTranscribeError(null);
 
