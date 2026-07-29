@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabase-browser";
+import { useUILanguage } from "@/lib/ui-language";
 
 type ProfileInfo = {
   tier: string;
@@ -17,7 +18,21 @@ const TIER_LABELS: Record<string, string> = {
   pro: "Pro",
 };
 
+
+const NAV_COPY: Record<string, Record<string, string>> = {
+  en: { pricing: "Pricing", signIn: "Sign in", upgrade: "Upgrade", signOut: "Sign out" },
+  ar: { pricing: "الأسعار", signIn: "تسجيل الدخول", upgrade: "ترقية", signOut: "تسجيل الخروج" },
+  fr: { pricing: "Tarifs", signIn: "Se connecter", upgrade: "Changer d'offre", signOut: "Se déconnecter" },
+  es: { pricing: "Precios", signIn: "Iniciar sesión", upgrade: "Mejorar plan", signOut: "Cerrar sesión" },
+  tr: { pricing: "Fiyatlar", signIn: "Giriş yap", upgrade: "Yükselt", signOut: "Çıkış yap" },
+  ur: { pricing: "قیمتیں", signIn: "سائن ان", upgrade: "اپ گریڈ", signOut: "سائن آؤٹ" },
+  hi: { pricing: "कीमतें", signIn: "साइन इन", upgrade: "अपग्रेड", signOut: "साइन आउट" },
+  de: { pricing: "Preise", signIn: "Anmelden", upgrade: "Upgraden", signOut: "Abmelden" },
+};
+
 export default function AccountBar() {
+  const { lang } = useUILanguage();
+  const nav = NAV_COPY[lang] ?? NAV_COPY.en;
   const router = useRouter();
   const supabase = createSupabaseBrowserClient();
 
@@ -71,13 +86,13 @@ export default function AccountBar() {
           href="/pricing"
           className="rounded-full border border-line px-3 py-1.5 text-xs font-medium text-ink-soft transition-colors hover:border-ink-faint hover:text-ink"
         >
-          Pricing
+          {nav.pricing}
         </Link>
         <Link
           href="/login"
           className="rounded-full bg-ink px-3 py-1.5 text-xs font-medium text-paper transition-opacity hover:opacity-90"
         >
-          Sign in
+          {nav.signIn}
         </Link>
       </div>
     );
@@ -123,7 +138,7 @@ export default function AccountBar() {
           href="/pricing"
           className="rounded-full bg-ink px-3 py-1.5 text-xs font-medium text-paper transition-opacity hover:opacity-90"
         >
-          Upgrade
+          {nav.upgrade}
         </Link>
       )}
 
@@ -132,7 +147,7 @@ export default function AccountBar() {
         onClick={handleSignOut}
         className="rounded-full border border-line px-3 py-1.5 text-xs font-medium text-ink-soft transition-colors hover:border-ink-faint hover:text-ink"
       >
-        Sign out
+        {nav.signOut}
       </button>
     </div>
   );
