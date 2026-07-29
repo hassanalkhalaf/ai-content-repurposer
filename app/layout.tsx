@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Space_Grotesk, Inter, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
 import { UILanguageProvider } from "@/lib/ui-language";
+import { Analytics } from "@vercel/analytics/next";
 
 const display = Space_Grotesk({
   subsets: ["latin"],
@@ -60,6 +61,7 @@ export default function RootLayout({
         className={`${display.variable} ${body.variable} ${mono.variable} font-body bg-paper text-ink antialiased`}
       >
         <UILanguageProvider>{children}</UILanguageProvider>
+        <Analytics />
       </body>
     </html>
   );
