@@ -69,7 +69,7 @@ export default function LoginPage() {
         <p className="mt-2 text-sm text-slate-500">
           {mode === "signin"
             ? "سجّل دخولك للمتابعة إلى Repurpose."
-            : "أنشئ حسابًا مجانيًا وابدأ بـ 5,000 كلمة شهريًا."}
+            : "أنشئ حسابًا مجانيًا وابدأ بـ 15,000 كلمة شهريًا."}
         </p>
 
         <div className="mt-6 space-y-4">
