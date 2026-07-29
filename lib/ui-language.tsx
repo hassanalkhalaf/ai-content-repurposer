@@ -380,7 +380,7 @@ interface UILanguageContextValue {
 
 const UILanguageContext = createContext<UILanguageContextValue | null>(null);
 
-const UI_LANGUAGE_STORAGE_KEY = "repurpose.ui-language";
+const UI_LANGUAGE_STORAGE_KEY = "repurpose.ui-language.v2";
 
 export function UILanguageProvider({ children }: { children: ReactNode }) {
   const [hydrated, setHydrated] = useState(false);
@@ -411,10 +411,15 @@ export function UILanguageProvider({ children }: { children: ReactNode }) {
     }
   }, [hydrated, lang]);
 
-  // Persist every later change so the choice survives a reload.
+  // Persist only a language the visitor actually picked. Writing the
+  // automatic default would pin it forever and stop future changes to
+  // that default from ever reaching returning visitors.
   useEffect(() => {
     if (!hydrated) return;
     try {
+      const alreadyChosen =
+        window.localStorage.getItem(UI_LANGUAGE_STORAGE_KEY) !== null;
+      if (lang === "ar" && !alreadyChosen) return;
       window.localStorage.setItem(UI_LANGUAGE_STORAGE_KEY, lang);
     } catch {
       // Ignore write failures; the choice still applies for this session.
