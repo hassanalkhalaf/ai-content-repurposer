@@ -397,9 +397,15 @@ export function UILanguageProvider({ children }: { children: ReactNode }) {
     setHydrated(true);
     try {
       const stored = window.localStorage.getItem(UI_LANGUAGE_STORAGE_KEY);
-      if (stored && stored !== lang && stored in TRANSLATIONS) {
-        setLang(stored as UILanguage);
+      if (stored && stored in TRANSLATIONS) {
+        if (stored !== lang) setLang(stored as UILanguage);
+        return;
       }
+      // No saved choice yet: follow the browser when we support it,
+      // and fall back to Arabic — our primary audience.
+      const browser = (navigator.language || "").slice(0, 2).toLowerCase();
+      const detected = browser in TRANSLATIONS ? browser : "ar";
+      if (detected !== lang) setLang(detected as UILanguage);
     } catch {
       // localStorage can be unavailable (private mode / blocked storage).
     }
