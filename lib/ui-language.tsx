@@ -47,6 +47,9 @@ interface Translations {
   linkedinSub: string;
   blogLabel: string;
   blogSub: string;
+  instagramLabel: string;
+  instagramSub: string;
+  transcribePaidOnly: string;
   contactTitle: string;
   contactDesc: string;
   namePlaceholder: string;
@@ -89,6 +92,9 @@ const TRANSLATIONS: Record<UILanguage, Translations> = {
     linkedinSub: "Hook + bullets",
     blogLabel: "Blog Article",
     blogSub: "SEO structured",
+    instagramLabel: "Instagram Caption",
+    instagramSub: "Hook + points",
+    transcribePaidOnly: "Audio and video transcription is available on the Starter and Pro plans.",
     contactTitle: "Contact me ✉️",
     contactDesc: "Have feedback or an idea to improve the site? Message me directly!",
     namePlaceholder: "Your name",
@@ -129,6 +135,9 @@ const TRANSLATIONS: Record<UILanguage, Translations> = {
     linkedinSub: "مقدمة + نقاط",
     blogLabel: "مقال مدونة",
     blogSub: "منظم لمحركات البحث",
+    instagramLabel: "كابشن إنستقرام",
+    instagramSub: "مقدمة + نقاط",
+    transcribePaidOnly: "تفريغ الصوت والفيديو متوفر في باقتي Starter و Pro.",
     contactTitle: "تواصل معي ✉️",
     contactDesc: "لديك ملاحظة أو فكرة لتطوير الموقع؟ أرسل لي مباشرة!",
     namePlaceholder: "اسمك الكريم",
@@ -169,6 +178,9 @@ const TRANSLATIONS: Record<UILanguage, Translations> = {
     linkedinSub: "Accroche + points clés",
     blogLabel: "Article de blog",
     blogSub: "Optimisé SEO",
+    instagramLabel: "Légende Instagram",
+    instagramSub: "Accroche + points",
+    transcribePaidOnly: "La transcription audio et vidéo est disponible avec les offres Starter et Pro.",
     contactTitle: "Contactez-moi ✉️",
     contactDesc: "Une idée ou un retour pour améliorer le site ? Écrivez-moi directement !",
     namePlaceholder: "Votre nom",
@@ -209,6 +221,9 @@ const TRANSLATIONS: Record<UILanguage, Translations> = {
     linkedinSub: "Gancho + puntos clave",
     blogLabel: "Artículo de blog",
     blogSub: "Optimizado para SEO",
+    instagramLabel: "Pie de foto de Instagram",
+    instagramSub: "Gancho + puntos",
+    transcribePaidOnly: "La transcripción de audio y vídeo está disponible en los planes Starter y Pro.",
     contactTitle: "Contáctame ✉️",
     contactDesc: "¿Tienes comentarios o una idea para mejorar el sitio? ¡Escríbeme directamente!",
     namePlaceholder: "Tu nombre",
@@ -249,6 +264,9 @@ const TRANSLATIONS: Record<UILanguage, Translations> = {
     linkedinSub: "Giriş + maddeler",
     blogLabel: "Blog Yazısı",
     blogSub: "SEO uyumlu",
+    instagramLabel: "Instagram açıklaması",
+    instagramSub: "Kanca + maddeler",
+    transcribePaidOnly: "Ses ve video deşifresi Starter ve Pro planlarında mevcuttur.",
     contactTitle: "Benimle iletişime geçin ✉️",
     contactDesc: "Siteyi geliştirmek için bir fikriniz mi var? Doğrudan bana yazın!",
     namePlaceholder: "Adınız",
@@ -289,6 +307,9 @@ const TRANSLATIONS: Record<UILanguage, Translations> = {
     linkedinSub: "ہک + نکات",
     blogLabel: "بلاگ آرٹیکل",
     blogSub: "SEO کے مطابق",
+    instagramLabel: "انسٹاگرام کیپشن",
+    instagramSub: "ہک + نکات",
+    transcribePaidOnly: "آڈیو اور ویڈیو کی نقل نویسی Starter اور Pro پلانز میں دستیاب ہے۔",
     contactTitle: "مجھ سے رابطہ کریں ✉️",
     contactDesc: "سائٹ کو بہتر بنانے کے لیے کوئی خیال یا رائے ہے؟ براہ راست پیغام بھیجیں!",
     namePlaceholder: "آپ کا نام",
@@ -329,6 +350,9 @@ const TRANSLATIONS: Record<UILanguage, Translations> = {
     linkedinSub: "हुक + मुख्य बिंदु",
     blogLabel: "ब्लॉग लेख",
     blogSub: "SEO के अनुकूल",
+    instagramLabel: "इंस्टाग्राम कैप्शन",
+    instagramSub: "हुक + बिंदु",
+    transcribePaidOnly: "ऑडियो और वीडियो ट्रांसक्रिप्शन Starter और Pro प्लान में उपलब्ध है।",
     contactTitle: "मुझसे संपर्क करें ✉️",
     contactDesc: "साइट को बेहतर बनाने के लिए कोई सुझाव या विचार है? सीधे मुझे संदेश भेजें!",
     namePlaceholder: "आपका नाम",
@@ -369,6 +393,9 @@ const TRANSLATIONS: Record<UILanguage, Translations> = {
     linkedinSub: "Aufhänger + Stichpunkte",
     blogLabel: "Blogartikel",
     blogSub: "SEO-optimiert",
+    instagramLabel: "Instagram-Caption",
+    instagramSub: "Aufhänger + Punkte",
+    transcribePaidOnly: "Audio- und Video-Transkription ist in den Tarifen Starter und Pro verfügbar.",
     contactTitle: "Kontaktieren Sie mich ✉️",
     contactDesc: "Haben Sie Feedback oder eine Idee zur Verbesserung der Seite? Schreiben Sie mir direkt!",
     namePlaceholder: "Ihr Name",
