@@ -110,7 +110,6 @@ export default function AccountBar() {
     <div className="flex items-center gap-2">
       {profile && (
         <div
-          title={`${remaining?.toLocaleString()} ${nav.remaining}`}
           className="flex items-center gap-2.5 rounded-full border border-line bg-panel px-2.5 py-1.5 sm:px-3"
         >
           <span className="text-xs font-semibold text-ink">
@@ -130,7 +129,7 @@ export default function AccountBar() {
                 isLow ? "font-semibold text-red-600" : "text-ink-faint"
               }`}
             >
-              {profile.wordsUsed.toLocaleString()} / {profile.wordsLimit.toLocaleString()} {nav.words}
+              {remaining?.toLocaleString()} {nav.remaining}
             </span>
           </div>
         </div>
