@@ -3,11 +3,10 @@
 import { MessageSquareText, Briefcase, Newspaper, Instagram } from "lucide-react";
 import clsx from "clsx";
 import { OutputFormat } from "@/lib/types";
+import { useUILanguage } from "@/lib/ui-language";
 
 interface FormatOption {
   value: OutputFormat;
-  label: string;
-  sub: string;
   icon: typeof MessageSquareText;
   activeClasses: string;
 }
@@ -15,29 +14,21 @@ interface FormatOption {
 const OPTIONS: FormatOption[] = [
   {
     value: "twitter",
-    label: "Twitter/X Thread",
-    sub: "5 tweets",
     icon: MessageSquareText,
     activeClasses: "border-signal-twitter/30 bg-signal-twitter/[0.06] text-signal-twitter",
   },
   {
     value: "linkedin",
-    label: "LinkedIn Post",
-    sub: "Hook + bullets",
     icon: Briefcase,
     activeClasses: "border-signal-linkedin/30 bg-signal-linkedin/[0.06] text-signal-linkedin",
   },
   {
     value: "blog",
-    label: "Blog Article",
-    sub: "SEO structured",
     icon: Newspaper,
     activeClasses: "border-signal-blog/30 bg-signal-blog/[0.06] text-signal-blog",
   },
   {
     value: "instagram",
-    label: "Instagram Caption",
-    sub: "Hook + points",
     icon: Instagram,
     activeClasses: "border-pink-500/30 bg-pink-500/[0.06] text-pink-600",
   },
@@ -50,6 +41,14 @@ interface Props {
 }
 
 export default function FormatSelector({ value, onChange, disabled }: Props) {
+  const { t } = useUILanguage();
+
+  const COPY: Record<OutputFormat, { label: string; sub: string }> = {
+    twitter: { label: t.twitterLabel, sub: t.twitterSub },
+    linkedin: { label: t.linkedinLabel, sub: t.linkedinSub },
+    blog: { label: t.blogLabel, sub: t.blogSub },
+    instagram: { label: t.instagramLabel, sub: t.instagramSub },
+  };
   return (
     <div
       role="radiogroup"
@@ -76,8 +75,8 @@ export default function FormatSelector({ value, onChange, disabled }: Props) {
           >
             <Icon size={18} strokeWidth={2} className="shrink-0" />
             <span className="flex flex-col leading-tight">
-              <span className="text-sm font-medium">{opt.label}</span>
-              <span className="text-xs text-ink-faint">{opt.sub}</span>
+              <span className="text-sm font-medium">{COPY[opt.value].label}</span>
+              <span className="text-xs text-ink-faint">{COPY[opt.value].sub}</span>
             </span>
           </button>
         );
