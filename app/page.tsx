@@ -119,7 +119,14 @@ export default function DashboardPage() {
       if (!res.ok) {
         const message =
           body && typeof body.error === "string" ? body.error : t.transcribeErrorFallback;
-        setTranscribeError(message);
+        // The API answers in English; swap the plan-gate message for the
+        // visitor's own language so it does not stand out mid-page.
+        setTranscribeError(
+          message ===
+            "Audio and video transcription is available on the Starter and Pro plans."
+            ? t.transcribePaidOnly
+            : message
+        );
         setTranscribeStatus("error");
         return;
       }
