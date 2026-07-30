@@ -35,6 +35,9 @@ export default function DashboardPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const charCount = transcript.length;
+  // Shown to the visitor in words, so it lines up with the monthly word
+  // allowance. The hard cap below stays in characters for the model.
+  const wordCount = transcript.trim() ? transcript.trim().split(/\s+/).length : 0;
   const isTooShort = charCount > 0 && charCount < MIN_TRANSCRIPT_LENGTH;
   const isTooLong = charCount > MAX_TRANSCRIPT_LENGTH;
   const canSubmit = useMemo(
@@ -202,7 +205,7 @@ export default function DashboardPage() {
                   isTooLong ? "font-semibold text-red-600" : "text-ink-faint"
                 }`}
               >
-                {charCount.toLocaleString()}/{MAX_TRANSCRIPT_LENGTH.toLocaleString()}
+                {wordCount.toLocaleString()} {t.wordsUnit}
               </span>
             </div>
 
