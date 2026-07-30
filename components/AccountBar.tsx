@@ -20,14 +20,14 @@ const TIER_LABELS: Record<string, string> = {
 
 
 const NAV_COPY: Record<string, Record<string, string>> = {
-  en: { pricing: "Pricing", signIn: "Sign in", upgrade: "Upgrade", signOut: "Sign out" },
-  ar: { pricing: "الأسعار", signIn: "تسجيل الدخول", upgrade: "ترقية", signOut: "تسجيل الخروج" },
-  fr: { pricing: "Tarifs", signIn: "Se connecter", upgrade: "Changer d'offre", signOut: "Se déconnecter" },
-  es: { pricing: "Precios", signIn: "Iniciar sesión", upgrade: "Mejorar plan", signOut: "Cerrar sesión" },
-  tr: { pricing: "Fiyatlar", signIn: "Giriş yap", upgrade: "Yükselt", signOut: "Çıkış yap" },
-  ur: { pricing: "قیمتیں", signIn: "سائن ان", upgrade: "اپ گریڈ", signOut: "سائن آؤٹ" },
-  hi: { pricing: "कीमतें", signIn: "साइन इन", upgrade: "अपग्रेड", signOut: "साइन आउट" },
-  de: { pricing: "Preise", signIn: "Anmelden", upgrade: "Upgraden", signOut: "Abmelden" },
+  en: { pricing: "Pricing", signIn: "Sign in", upgrade: "Upgrade", signOut: "Sign out" words: "words", freeTier: "free", remaining: "left", },
+  ar: { pricing: "الأسعار", signIn: "تسجيل الدخول", upgrade: "ترقية", signOut: "تسجيل الخروج" words: "كلمة", freeTier: "مجاني", remaining: "متبقية", },
+  fr: { pricing: "Tarifs", signIn: "Se connecter", upgrade: "Changer d'offre", signOut: "Se déconnecter" words: "mots", freeTier: "Gratuit", remaining: "restants", },
+  es: { pricing: "Precios", signIn: "Iniciar sesión", upgrade: "Mejorar plan", signOut: "Cerrar sesión" words: "palabras", freeTier: "Gratis", remaining: "restantes", },
+  tr: { pricing: "Fiyatlar", signIn: "Giriş yap", upgrade: "Yükselt", signOut: "Çıkış yap" words: "kelime", freeTier: "Ücretsiz", remaining: "kaldı", },
+  ur: { pricing: "قیمتیں", signIn: "سائن ان", upgrade: "اپ گریڈ", signOut: "سائن آؤٹ" words: "الفاظ", freeTier: "مفت", remaining: "باقی", },
+  hi: { pricing: "कीमतें", signIn: "साइन इन", upgrade: "अपग्रेड", signOut: "साइन आउट" words: "शब्द", freeTier: "मुफ़्त", remaining: "शेष", },
+  de: { pricing: "Preise", signIn: "Anmelden", upgrade: "Upgraden", signOut: "Abmelden" words: "Wörter", freeTier: "Kostenlos", remaining: "übrig", },
 };
 
 export default function AccountBar() {
@@ -109,9 +109,12 @@ export default function AccountBar() {
   return (
     <div className="flex items-center gap-2">
       {profile && (
-        <div className="hidden items-center gap-2.5 rounded-full border border-line bg-panel px-3 py-1.5 sm:flex">
+        <div
+          title={`${remaining?.toLocaleString()} ${nav.remaining}`}
+          className="flex items-center gap-2.5 rounded-full border border-line bg-panel px-2.5 py-1.5 sm:px-3"
+        >
           <span className="text-xs font-semibold text-ink">
-            {TIER_LABELS[profile.tier] ?? profile.tier}
+            {profile.tier === "free" ? nav.freeTier : TIER_LABELS[profile.tier] ?? profile.tier}
           </span>
           <span className="h-3 w-px bg-line" />
           <div className="flex items-center gap-2">
@@ -127,7 +130,7 @@ export default function AccountBar() {
                 isLow ? "font-semibold text-red-600" : "text-ink-faint"
               }`}
             >
-              {remaining?.toLocaleString()} left
+              {profile.wordsUsed.toLocaleString()} / {profile.wordsLimit.toLocaleString()} {nav.words}
             </span>
           </div>
         </div>
