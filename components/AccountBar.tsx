@@ -66,7 +66,17 @@ export default function AccountBar() {
       setReady(true);
     }
     load();
-  }, [supabase]);
+ }, [supabase, refreshKey]);
+
+  // The page fires this after a generation so the badge re-reads the quota.
+  useEffect(() => {
+    function handleUsageChanged() {
+      setRefreshKey((k) => k + 1);
+    }
+    window.addEventListener("repurpose:usage-changed", handleUsageChanged);
+    return () =>
+      window.removeEventListener("repurpose:usage-changed", handleUsageChanged);
+  }, []);
 
   async function handleSignOut() {
     await supabase.auth.signOut();
