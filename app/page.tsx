@@ -60,8 +60,10 @@ export default function DashboardPage() {
       const body = await res.json().catch(() => null);
 
       if (!res.ok) {
-        const message =
-          body && typeof body.error === "string"
+       const message =
+          body && body.code === "quota_exceeded"
+            ? t.quotaExceeded
+            : body && typeof body.error === "string"
             ? body.error
             : "Something went wrong. Please try again.";
         setError(message);
