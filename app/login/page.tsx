@@ -4,7 +4,25 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabase-browser";
 
+const AUTH_ERRORS: Record<string, string> = {
+  "Email not confirmed":
+    "لم تؤكد بريدك بعد. افتح الرسالة المرسلة إلى بريدك واضغط رابط التأكيد.",
+  "Invalid login credentials": "البريد الإلكتروني أو كلمة المرور غير صحيحة.",
+  "User already registered":
+    "هذا البريد مسجّل بالفعل. سجّل دخولك بدل إنشاء حساب جديد.",
+  "Email rate limit exceeded":
+    "حاولت مرات كثيرة. انتظر بضع دقائق ثم أعد المحاولة.",
+  "Unable to validate email address: invalid format":
+    "صيغة البريد الإلكتروني غير صحيحة.",
+};
+
+function translateAuthError(message?: string) {
+  if (!message) return "حدث خطأ، حاول مرة أخرى.";
+  return AUTH_ERRORS[message] ?? message;
+}
+
 export default function LoginPage() {
+  const [needsConfirmation, setNeedsConfirmation] = useState(false);
   const router = useRouter();
   const supabase = createSupabaseBrowserClient();
 
@@ -18,7 +36,7 @@ export default function LoginPage() {
   async function handleSubmit() {
     setError(null);
     setNotice(null);
-
+setNeedsConfirmation(false);
     if (!email || !password) {
       setError("الرجاء تعبئة البريد الإلكتروني وكلمة المرور.");
       return;
@@ -51,12 +69,32 @@ export default function LoginPage() {
         router.refresh();
       }
     } catch (err: any) {
-      setError(err?.message ?? "حدث خطأ، حاول مرة أخرى.");
+setError(translateAuthError(err?.message));
+      setNeedsConfirmation(err?.message === "Email not confirmed");    } finally {
+      setLoading(false);
+    }
+  }
+async function handleResendConfirmation() {
+    setError(null);
+    setNotice(null);
+    setLoading(true);
+    try {
+      const { error } = await supabase.auth.resend({
+        type: "signup",
+        email,
+        options: {
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
+      if (error) throw error;
+      setNeedsConfirmation(false);
+      setNotice("أرسلنا رابط التأكيد من جديد. تحقق من بريدك.");
+    } catch (err: any) {
+      setError(translateAuthError(err?.message));
     } finally {
       setLoading(false);
     }
   }
-
   return (
     <main
       dir="rtl"
@@ -108,6 +146,15 @@ export default function LoginPage() {
             <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
               {error}
             </p>
+          )}
+          {needsConfirmation && (
+            <button
+              onClick={handleResendConfirmation}
+              disabled={loading}
+              className="rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50 disabled:opacity-50"
+            >
+              أعد إرسال رابط التأكيد
+            </button>
           )}
           {notice && (
             <p className="rounded-lg bg-green-50 px-3 py-2 text-sm text-green-700">
