@@ -71,6 +71,9 @@ export default function DashboardPage() {
 
       setResult(body as RepurposeData);
       setStatus("success");
+      // Tell the header badge to re-read the quota this generation just spent.
+      window.dispatchEvent(new Event("repurpose:usage-changed"));
+      setStatus("success");
     } catch {
       setError("Couldn't reach the server. Check your connection and try again.");
       setStatus("error");
