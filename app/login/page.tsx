@@ -88,7 +88,9 @@ async function handleResendConfirmation() {
       });
       if (error) throw error;
       setNeedsConfirmation(false);
-      setNotice("أرسلنا رابط التأكيد من جديد. تحقق من بريدك.");
+      setNotice(
+        "أرسلنا رابط التأكيد من جديد. تحقق من بريدك ومن مجلد الرسائل غير المرغوب فيها. إن لم تصلك خلال بضع دقائق فالغالب أن البريد مكتوب بشكل خاطئ — أنشئ حسابًا بالعنوان الصحيح."
+      );
     } catch (err: any) {
       setError(translateAuthError(err?.message));
     } finally {
