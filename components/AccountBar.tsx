@@ -31,6 +31,7 @@ const NAV_COPY: Record<string, Record<string, string>> = {
 };
 
 export default function AccountBar() {
+  const [refreshKey, setRefreshKey] = useState(0);
   const { lang } = useUILanguage();
   const nav = NAV_COPY[lang] ?? NAV_COPY.en;
   const router = useRouter();
