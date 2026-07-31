@@ -50,6 +50,7 @@ interface Translations {
   instagramLabel: string;
   instagramSub: string;
   transcribePaidOnly: string;
+       quotaExceeded: string;
   wordsUnit: string;
   contactTitle: string;
   contactDesc: string;
@@ -96,6 +97,7 @@ const TRANSLATIONS: Record<UILanguage, Translations> = {
     instagramLabel: "Instagram Caption",
     instagramSub: "Hook + points",
     transcribePaidOnly: "Audio and video transcription is available on the Starter and Pro plans.",
+    quotaExceeded: "You've used your allowance for this month. It renews automatically at the start of next month. Paid plans are opening soon — email support@repurpose.tools and we'll let you know the moment they're ready.",
     wordsUnit: "words",
     contactTitle: "Contact me ✉️",
     contactDesc: "Have feedback or an idea to improve the site? Message me directly!",
@@ -140,6 +142,7 @@ const TRANSLATIONS: Record<UILanguage, Translations> = {
     instagramLabel: "كابشن إنستقرام",
     instagramSub: "مقدمة + نقاط",
     transcribePaidOnly: "تفريغ الصوت والفيديو متوفر في باقتي Starter و Pro.",
+    quotaExceeded: "انتهت حصتك لهذا الشهر. تتجدد تلقائيًا أول الشهر القادم. والاشتراكات المدفوعة تُفتح قريبًا — راسلنا على support@repurpose.tools ونخبرك أول ما تجهز.",
     wordsUnit: "كلمة",
     contactTitle: "تواصل معي ✉️",
     contactDesc: "لديك ملاحظة أو فكرة لتطوير الموقع؟ أرسل لي مباشرة!",
@@ -184,6 +187,7 @@ const TRANSLATIONS: Record<UILanguage, Translations> = {
     instagramLabel: "Légende Instagram",
     instagramSub: "Accroche + points",
     transcribePaidOnly: "La transcription audio et vidéo est disponible avec les offres Starter et Pro.",
+    quotaExceeded: "Vous avez épuisé votre quota pour ce mois-ci. Il se renouvelle automatiquement au début du mois prochain. Les offres payantes arrivent bientôt — écrivez à support@repurpose.tools et nous vous préviendrons dès qu'elles seront prêtes.",
     wordsUnit: "mots",
     contactTitle: "Contactez-moi ✉️",
     contactDesc: "Une idée ou un retour pour améliorer le site ? Écrivez-moi directement !",
@@ -228,6 +232,7 @@ const TRANSLATIONS: Record<UILanguage, Translations> = {
     instagramLabel: "Pie de foto de Instagram",
     instagramSub: "Gancho + puntos",
     transcribePaidOnly: "La transcripción de audio y vídeo está disponible en los planes Starter y Pro.",
+    quotaExceeded: "Has agotado tu cuota de este mes. Se renueva automáticamente al principio del mes que viene. Los planes de pago se abrirán pronto: escríbenos a support@repurpose.tools y te avisamos en cuanto estén listos.",
     wordsUnit: "palabras",
     contactTitle: "Contáctame ✉️",
     contactDesc: "¿Tienes comentarios o una idea para mejorar el sitio? ¡Escríbeme directamente!",
@@ -272,6 +277,7 @@ const TRANSLATIONS: Record<UILanguage, Translations> = {
     instagramLabel: "Instagram açıklaması",
     instagramSub: "Kanca + maddeler",
     transcribePaidOnly: "Ses ve video deşifresi Starter ve Pro planlarında mevcuttur.",
+    quotaExceeded: "Bu ayki kotanızı doldurdunuz. Gelecek ayın başında otomatik olarak yenilenir. Ücretli planlar yakında açılıyor — support@repurpose.tools adresine yazın, hazır olur olmaz size haber verelim.",
     wordsUnit: "kelime",
     contactTitle: "Benimle iletişime geçin ✉️",
     contactDesc: "Siteyi geliştirmek için bir fikriniz mi var? Doğrudan bana yazın!",
@@ -316,6 +322,7 @@ const TRANSLATIONS: Record<UILanguage, Translations> = {
     instagramLabel: "انسٹاگرام کیپشن",
     instagramSub: "ہک + نکات",
     transcribePaidOnly: "آڈیو اور ویڈیو کی نقل نویسی Starter اور Pro پلانز میں دستیاب ہے۔",
+    quotaExceeded: "اس مہینے کا آپ کا کوٹا ختم ہو گیا ہے۔ یہ اگلے مہینے کے آغاز میں خودکار طور پر تجدید ہو جائے گا۔ ادائیگی والے پلانز جلد کھل رہے ہیں — support@repurpose.tools پر ای میل کریں، تیار ہوتے ہی ہم آپ کو بتا دیں گے۔",
     wordsUnit: "الفاظ",
     contactTitle: "مجھ سے رابطہ کریں ✉️",
     contactDesc: "سائٹ کو بہتر بنانے کے لیے کوئی خیال یا رائے ہے؟ براہ راست پیغام بھیجیں!",
@@ -360,6 +367,7 @@ const TRANSLATIONS: Record<UILanguage, Translations> = {
     instagramLabel: "इंस्टाग्राम कैप्शन",
     instagramSub: "हुक + बिंदु",
     transcribePaidOnly: "ऑडियो और वीडियो ट्रांसक्रिप्शन Starter और Pro प्लान में उपलब्ध है।",
+    quotaExceeded: "इस महीने का आपका कोटा खत्म हो गया है। यह अगले महीने की शुरुआत में अपने आप नवीनीकृत हो जाएगा। सशुल्क प्लान जल्द खुल रहे हैं — support@repurpose.tools पर लिखें, तैयार होते ही हम आपको बता देंगे।",
     wordsUnit: "शब्द",
     contactTitle: "मुझसे संपर्क करें ✉️",
     contactDesc: "साइट को बेहतर बनाने के लिए कोई सुझाव या विचार है? सीधे मुझे संदेश भेजें!",
@@ -404,6 +412,7 @@ const TRANSLATIONS: Record<UILanguage, Translations> = {
     instagramLabel: "Instagram-Caption",
     instagramSub: "Aufhänger + Punkte",
     transcribePaidOnly: "Audio- und Video-Transkription ist in den Tarifen Starter und Pro verfügbar.",
+    quotaExceeded: "Ihr Kontingent für diesen Monat ist aufgebraucht. Es wird zu Beginn des nächsten Monats automatisch erneuert. Kostenpflichtige Tarife starten bald — schreiben Sie an support@repurpose.tools und wir melden uns, sobald sie verfügbar sind.",
     wordsUnit: "Wörter",
     contactTitle: "Kontaktieren Sie mich ✉️",
     contactDesc: "Haben Sie Feedback oder eine Idee zur Verbesserung der Seite? Schreiben Sie mir direkt!",
