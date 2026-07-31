@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
 
   try {
     const { error } = await resend.emails.send({
-      from: "Contact Form <onboarding@resend.dev>",
+      from: "Repurpose <noreply@repurpose.tools>",
       to: process.env.CONTACT_RECEIVER_EMAIL ?? "your-inbox@example.com",
       replyTo: email,
       subject: `رسالة جديدة من ${name}`,
