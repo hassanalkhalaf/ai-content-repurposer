@@ -60,7 +60,7 @@ export default function AccountBar() {
           setProfile({
             tier: data.subscription_tier ?? "free",
             wordsUsed: data.words_used ?? 0,
-            wordsLimit: data.words_limit ?? 15000,
+            wordsLimit: data.words_limit ?? 30000,
           });
         }
       }
