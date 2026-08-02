@@ -24,6 +24,7 @@ const COPY: Record<string, any> = {
     current: "Current plan",
     signIn: "Sign in to upgrade",
     upgrade: "Upgrade",
+    comingSoon: "Coming soon",
     footer: "Cancel any time. Payments are processed securely by Lemon Squeezy.",
     free: {
       name: "Free",
@@ -57,6 +58,7 @@ const COPY: Record<string, any> = {
     current: "الباقة الحالية",
     signIn: "سجّل دخولك للاشتراك",
     upgrade: "ترقية",
+    comingSoon: "قريبًا",
     footer: "يمكنك الإلغاء في أي وقت. الدفع يتم عبر Lemon Squeezy بشكل آمن.",
     free: {
       name: "مجاني",
@@ -90,6 +92,7 @@ const COPY: Record<string, any> = {
     current: "Offre actuelle",
     signIn: "Connectez-vous pour changer d'offre",
     upgrade: "Passer à l'offre",
+    comingSoon: "Bientôt disponible",
     footer:
       "Annulable à tout moment. Paiements traités en toute sécurité par Lemon Squeezy.",
     free: {
@@ -128,6 +131,7 @@ const COPY: Record<string, any> = {
     current: "Plan actual",
     signIn: "Inicia sesión para mejorar tu plan",
     upgrade: "Mejorar plan",
+    comingSoon: "Próximamente",
     footer:
       "Cancela cuando quieras. Los pagos los procesa Lemon Squeezy de forma segura.",
     free: {
@@ -166,6 +170,7 @@ const COPY: Record<string, any> = {
     current: "Mevcut plan",
     signIn: "Yükseltmek için giriş yapın",
     upgrade: "Yükselt",
+    comingSoon: "Yakında",
     footer:
       "İstediğiniz zaman iptal edin. Ödemeler Lemon Squeezy tarafından güvenle işlenir.",
     free: {
@@ -200,6 +205,7 @@ const COPY: Record<string, any> = {
     current: "موجودہ پلان",
     signIn: "اپ گریڈ کرنے کے لیے سائن ان کریں",
     upgrade: "اپ گریڈ کریں",
+    comingSoon: "جلد آ رہا ہے",
     footer:
       "کسی بھی وقت منسوخ کریں۔ ادائیگیاں Lemon Squeezy کے ذریعے محفوظ طریقے سے ہوتی ہیں۔",
     free: {
@@ -234,6 +240,7 @@ const COPY: Record<string, any> = {
     current: "मौजूदा प्लान",
     signIn: "अपग्रेड करने के लिए साइन इन करें",
     upgrade: "अपग्रेड करें",
+    comingSoon: "जल्द आ रहा है",
     footer:
       "कभी भी रद्द करें। भुगतान Lemon Squeezy द्वारा सुरक्षित रूप से संसाधित होते हैं।",
     free: {
@@ -272,6 +279,7 @@ const COPY: Record<string, any> = {
     current: "Aktueller Tarif",
     signIn: "Zum Upgrade anmelden",
     upgrade: "Upgraden",
+    comingSoon: "Demnächst",
     footer:
       "Jederzeit kündbar. Zahlungen werden sicher über Lemon Squeezy abgewickelt.",
     free: {
@@ -332,6 +340,10 @@ export default function PricingPage() {
     };
   }, []);
 
+  // Kept for when Lemon Squeezy approves the store and the upgrade buttons
+  // come back. Until then the paid cards show a "coming soon" label instead,
+  // because the checkout links still point at the test-mode store and would
+  // reject a real card.
   function goToPlan(plan: "starter" | "pro") {
     if (!email) {
       router.push("/login");
@@ -340,6 +352,9 @@ export default function PricingPage() {
     window.location.href =
       CHECKOUT_URLS[plan] + "?checkout[email]=" + encodeURIComponent(email);
   }
+
+  void goToPlan;
+  void checked;
 
   const plans = [
     { key: "free" as const, price: "$0", copy: c.free, popular: false },
@@ -415,14 +430,9 @@ export default function PricingPage() {
                     {c.current}
                   </div>
                 ) : (
-                  <button
-                    type="button"
-                    disabled={!checked}
-                    onClick={() => goToPlan(key as "starter" | "pro")}
-                    className="w-full rounded-xl bg-slate-900 px-4 py-3 text-sm font-medium text-white transition hover:bg-slate-800 disabled:opacity-50"
-                  >
-                    {email ? c.upgrade : c.signIn}
-                  </button>
+                  <div className="w-full rounded-xl border border-slate-200 px-4 py-3 text-center text-sm text-slate-400">
+                    {c.comingSoon}
+                  </div>
                 )}
               </div>
             </div>
