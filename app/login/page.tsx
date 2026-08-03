@@ -22,7 +22,6 @@ function translateAuthError(message?: string) {
 }
 
 export default function LoginPage() {
-  const [needsConfirmation, setNeedsConfirmation] = useState(false);
   const router = useRouter();
   const supabase = createSupabaseBrowserClient();
 
@@ -32,11 +31,13 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+  const [needsConfirmation, setNeedsConfirmation] = useState(false);
 
   async function handleSubmit() {
     setError(null);
     setNotice(null);
-setNeedsConfirmation(false);
+    setNeedsConfirmation(false);
+
     if (!email || !password) {
       setError("الرجاء تعبئة البريد الإلكتروني وكلمة المرور.");
       return;
@@ -58,7 +59,9 @@ setNeedsConfirmation(false);
           },
         });
         if (error) throw error;
-        setNotice("تم إنشاء الحساب! تحقق من بريدك الإلكتروني لتأكيد الحساب.");
+        setNotice(
+          "إن لم يكن هذا البريد مسجّلًا من قبل، ستصلك رسالة تأكيد خلال دقائق. وإن كان مسجّلًا، سجّل دخولك أو استخدم «نسيت كلمة المرور؟»."
+        );
       } else {
         const { error } = await supabase.auth.signInWithPassword({
           email,
@@ -69,15 +72,18 @@ setNeedsConfirmation(false);
         router.refresh();
       }
     } catch (err: any) {
-setError(translateAuthError(err?.message));
-      setNeedsConfirmation(err?.message === "Email not confirmed");    } finally {
+      setError(translateAuthError(err?.message));
+      setNeedsConfirmation(err?.message === "Email not confirmed");
+    } finally {
       setLoading(false);
     }
   }
-async function handleResendConfirmation() {
+
+  async function handleResendConfirmation() {
     setError(null);
     setNotice(null);
     setLoading(true);
+
     try {
       const { error } = await supabase.auth.resend({
         type: "signup",
@@ -97,6 +103,32 @@ async function handleResendConfirmation() {
       setLoading(false);
     }
   }
+
+  async function handleForgotPassword() {
+    setError(null);
+    setNotice(null);
+
+    if (!email) {
+      setError("اكتب بريدك الإلكتروني أولًا ثم اضغط «نسيت كلمة المرور؟».");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/auth/callback?next=/auth/reset-password`,
+      });
+      if (error) throw error;
+      setNotice(
+        "إن كان هذا البريد مسجّلًا لدينا، ستصلك رسالة فيها رابط لتعيين كلمة مرور جديدة. تحقق أيضًا من مجلد الرسائل غير المرغوب فيها."
+      );
+    } catch (err: any) {
+      setError(translateAuthError(err?.message));
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
     <main
       dir="rtl"
@@ -149,6 +181,7 @@ async function handleResendConfirmation() {
               {error}
             </p>
           )}
+
           {needsConfirmation && (
             <button
               onClick={handleResendConfirmation}
@@ -158,10 +191,21 @@ async function handleResendConfirmation() {
               أعد إرسال رابط التأكيد
             </button>
           )}
+
           {notice && (
             <p className="rounded-lg bg-green-50 px-3 py-2 text-sm text-green-700">
               {notice}
             </p>
+          )}
+
+          {mode === "signin" && (
+            <button
+              onClick={handleForgotPassword}
+              disabled={loading}
+              className="block w-full text-right text-sm text-slate-600 underline disabled:opacity-50"
+            >
+              نسيت كلمة المرور؟
+            </button>
           )}
 
           <button
@@ -184,6 +228,7 @@ async function handleResendConfirmation() {
               setMode(mode === "signin" ? "signup" : "signin");
               setError(null);
               setNotice(null);
+              setNeedsConfirmation(false);
             }}
             className="font-medium text-slate-900 underline"
           >
