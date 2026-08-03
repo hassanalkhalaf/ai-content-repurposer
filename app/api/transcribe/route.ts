@@ -12,6 +12,10 @@ const MAX_FILE_SIZE_BYTES = 25 * 1024 * 1024;
 // Transcription costs real money per minute of audio, so it's a paid feature.
 const PAID_TIERS = ["starter", "pro"];
 
+// Nudges Whisper toward the vocabulary it will actually hear. Max ~200 words.
+const TRANSCRIPTION_PROMPT =
+  "تفريغ حلقة بودكاست بالعربية. قد ترد مصطلحات تقنية وأسماء منصات مثل: Vercel، Supabase، OpenAI، API، ثريد، تويتر، لينكدإن، إنستقرام، ميجابايت، اشتراك، باقة، تفريغ، محتوى، مشروع.";
+
 export async function POST(req: NextRequest) {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) {
@@ -120,6 +124,8 @@ export async function POST(req: NextRequest) {
   const fileBlob = new Blob([fileBuffer], { type: contentType });
   upstreamForm.append("file", fileBlob, fileName || "audio");
   upstreamForm.append("model", "whisper-1");
+  upstreamForm.append("language", "ar");
+  upstreamForm.append("prompt", TRANSCRIPTION_PROMPT);
 
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 55000);
