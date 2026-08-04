@@ -5,8 +5,7 @@ import { createSupabaseAdminClient } from "@/lib/supabase-admin";
 
 export const maxDuration = 60;
 
-const MAX_FILE_SIZE_BYTES = 25 * 1024 * 1024;
-
+const MAX_FILE_SIZE_BYTES = 500 * 1024 * 1024;
 const PAID_TIERS = ["starter", "pro"];
 
 const CLEANUP_PROMPT = `أنت مدقّق لنصوص التفريغ الصوتي العربي باللهجة الخليجية.
