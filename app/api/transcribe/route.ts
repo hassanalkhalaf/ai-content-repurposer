@@ -134,7 +134,7 @@ export async function POST(req: NextRequest) {
   }
 
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 25000);
+  const timeout = setTimeout(() => controller.abort(), 20000);
 
   let rawText = "";
 
@@ -227,10 +227,11 @@ async function cleanupTranscript(rawText: string): Promise<string | null> {
     return null;
   }
 
+  const started = Date.now();
   console.log("CLEANUP: starting, input " + rawText.length + " chars.");
 
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 28000);
+  const timeout = setTimeout(() => controller.abort(), 33000);
 
   try {
     const response = await fetch("https://api.anthropic.com/v1/messages", {
@@ -241,8 +242,8 @@ async function cleanupTranscript(rawText: string): Promise<string | null> {
         "anthropic-version": "2023-06-01",
       },
       body: JSON.stringify({
-        model: "claude-sonnet-4-5",
-        max_tokens: 8000,
+        model: "claude-haiku-4-5",
+        max_tokens: 4000,
         messages: [
           {
             role: "user",
@@ -271,10 +272,14 @@ async function cleanupTranscript(rawText: string): Promise<string | null> {
       return null;
     }
 
-    console.log("CLEANUP: success, " + text.length + " chars.");
+    console.log(
+      "CLEANUP: success in " + (Date.now() - started) + "ms, " + text.length + " chars."
+    );
     return text;
   } catch (err: any) {
-    console.error("CLEANUP: failed — " + (err?.name ?? "") + " " + (err?.message ?? ""));
+    console.error(
+      "CLEANUP: failed after " + (Date.now() - started) + "ms — " + (err?.name ?? "") + " " + (err?.message ?? "")
+    );
     return null;
   } finally {
     clearTimeout(timeout);
