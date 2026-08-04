@@ -5,7 +5,6 @@ import { createSupabaseAdminClient } from "@/lib/supabase-admin";
 
 export const maxDuration = 60;
 
-const MAX_FILE_SIZE_BYTES = 500 * 1024 * 1024;
 const PAID_TIERS = ["starter", "pro"];
 
 const CLEANUP_PROMPT = `أنت مدقّق لنصوص التفريغ الصوتي العربي باللهجة الخليجية.
@@ -95,44 +94,6 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const blobToken = process.env.BLOB_READ_WRITE_TOKEN;
-
-  let fileBuffer: ArrayBuffer;
-  let contentType: string;
-  try {
-    const blobResponse = await fetch(blobUrl, {
-      headers: blobToken ? { Authorization: "Bearer " + blobToken } : {},
-    });
-
-    if (!blobResponse.ok) {
-      return NextResponse.json(
-        { error: "Could not retrieve the uploaded file. Please try uploading again." },
-        { status: 502 }
-      );
-    }
-
-    contentType = blobResponse.headers.get("content-type") ?? "application/octet-stream";
-    fileBuffer = await blobResponse.arrayBuffer();
-  } catch {
-    return NextResponse.json(
-      { error: "Could not retrieve the uploaded file. Please try uploading again." },
-      { status: 502 }
-    );
-  }
-
-  if (fileBuffer.byteLength === 0) {
-    await safeDeleteBlob(blobUrl);
-    return NextResponse.json({ error: "The uploaded file is empty." }, { status: 400 });
-  }
-
-  if (fileBuffer.byteLength > MAX_FILE_SIZE_BYTES) {
-    await safeDeleteBlob(blobUrl);
-    return NextResponse.json(
-      { error: "That file is too large — please keep it under 25MB." },
-      { status: 400 }
-    );
-  }
-
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 20000);
 
@@ -142,13 +103,15 @@ export async function POST(req: NextRequest) {
     const dgUrl =
       "https://api.deepgram.com/v1/listen?model=nova-3&language=ar&smart_format=true&punctuate=true";
 
+    console.log("DEEPGRAM: sending URL " + blobUrl);
+
     const response = await fetch(dgUrl, {
       method: "POST",
       headers: {
         Authorization: "Token " + deepgramKey,
-        "Content-Type": contentType,
+        "Content-Type": "application/json",
       },
-      body: fileBuffer,
+      body: JSON.stringify({ url: blobUrl }),
       signal: controller.signal,
     });
 
