@@ -5,22 +5,40 @@ import { createSupabaseAdminClient } from "@/lib/supabase-admin";
 
 export const maxDuration = 60;
 
-// This mirrors OpenAI Whisper's own 25MB hard limit per file. It's enforced
-// again here (in addition to at Blob-upload time) as a second safety net.
+// Deepgram accepts far larger files, but Vercel Blob upload + a 60s function
+// timeout are the real ceiling here, so we keep the same 25MB guard.
 const MAX_FILE_SIZE_BYTES = 25 * 1024 * 1024;
 
 // Transcription costs real money per minute of audio, so it's a paid feature.
 const PAID_TIERS = ["starter", "pro"];
 
-// Nudges Whisper toward the vocabulary it will actually hear. Max ~200 words.
-const TRANSCRIPTION_PROMPT =
-  "تفريغ حلقة بودكاست بالعربية. قد ترد مصطلحات تقنية وأسماء منصات مثل: Vercel، Supabase، OpenAI، API، ثريد، تويتر، لينكدإن، إنستقرام، ميجابايت، اشتراك، باقة، تفريغ، محتوى، مشروع.";
+const CLEANUP_PROMPT = `أنت محرّر متخصص في معالجة وتدقيق نصوص التفريغ الصوتي.
+
+النص التالي مفرّغ آلياً من محتوى عربي قد يكون مختلطاً بالإنجليزية، ويحتوي على أخطاء لفظية وتكرارات وكلمات وجمل إنجليزية كُتبت صوتياً بحروف عربية.
+
+التعليمات:
+
+1. أعد كتابة أي كلمة أو جملة إنجليزية نُطقت في التسجيل بحروفها الإنجليزية الصحيحة. مثال: "و ك ذس" ← "We did this"، "بوث" ← "Booth"، "دفت" ← "Drift".
+
+2. المصطلحات التقنية وأسماء المنصات اكتبها بالإنجليزية بين قوسين بعد العربية عند أول ورود، هكذا: البوث (Booth).
+
+3. أصلح الأخطاء اللفظية الواضحة في العربية، وأبقِ روح اللهجة كما هي.
+
+4. أزل التكرارات الناتجة عن التلعثم، واحتفظ بورود واحد من العبارات المكررة.
+
+5. أضف علامات الترقيم المناسبة، وقسّم النص إلى جمل وفقرات مفهومة.
+
+6. لا تضف معلومات غير موجودة في النص الخام. إذا تعذّر فهم مقطع تماماً، ضع [غير واضح].
+
+7. أخرج النص المنظّف فقط، وابدأ ردك مباشرة بأول كلمة منه.
+
+النص الخام:`;
 
 export async function POST(req: NextRequest) {
-  const apiKey = process.env.OPENAI_API_KEY;
-  if (!apiKey) {
+  const deepgramKey = process.env.DEEPGRAM_API_KEY;
+  if (!deepgramKey) {
     return NextResponse.json(
-      { error: "Server is missing OPENAI_API_KEY. Add it to your environment to enable transcription." },
+      { error: "Server is missing DEEPGRAM_API_KEY. Add it to your environment to enable transcription." },
       { status: 500 }
     );
   }
@@ -32,7 +50,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid request." }, { status: 400 });
   }
 
-  const { blobUrl, fileName } = body;
+  const { blobUrl } = body;
   if (typeof blobUrl !== "string" || blobUrl.trim().length === 0) {
     return NextResponse.json(
       { error: "Missing uploaded file reference." },
@@ -120,23 +138,22 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const upstreamForm = new FormData();
-  const fileBlob = new Blob([fileBuffer], { type: contentType });
-  upstreamForm.append("file", fileBlob, fileName || "audio");
-  upstreamForm.append("model", "whisper-1");
-  upstreamForm.append("language", "ar");
-  upstreamForm.append("prompt", TRANSCRIPTION_PROMPT);
-
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 55000);
+  const timeout = setTimeout(() => controller.abort(), 40000);
+
+  let rawText = "";
 
   try {
-    const response = await fetch("https://api.openai.com/v1/audio/transcriptions", {
+    const dgUrl =
+      "https://api.deepgram.com/v1/listen?model=nova-2&language=multi&smart_format=true&punctuate=true";
+
+    const response = await fetch(dgUrl, {
       method: "POST",
       headers: {
-        Authorization: "Bearer " + apiKey,
+        Authorization: "Token " + deepgramKey,
+        "Content-Type": contentType,
       },
-      body: upstreamForm,
+      body: fileBuffer,
       signal: controller.signal,
     });
 
@@ -145,13 +162,13 @@ export async function POST(req: NextRequest) {
       let detail = "";
       try {
         const errBody = await response.json();
-        detail = errBody?.error?.message ?? "";
+        detail = errBody?.err_msg ?? errBody?.error ?? "";
       } catch {
       }
 
-      if (status === 401) {
+      if (status === 401 || status === 403) {
         return NextResponse.json(
-          { error: "Server API key was rejected by the provider." },
+          { error: "Server API key was rejected by the transcription provider." },
           { status: 500 }
         );
       }
@@ -174,15 +191,15 @@ export async function POST(req: NextRequest) {
     }
 
     const data = await response.json();
-    const text = typeof data?.text === "string" ? data.text : "";
-    if (!text.trim()) {
+    rawText =
+      data?.results?.channels?.[0]?.alternatives?.[0]?.transcript ?? "";
+
+    if (!rawText.trim()) {
       return NextResponse.json(
         { error: "Transcription came back empty. Please try a different file." },
         { status: 502 }
       );
     }
-
-    return NextResponse.json({ text }, { status: 200 });
   } catch (err) {
     if (err instanceof Error && err.name === "AbortError") {
       return NextResponse.json(
@@ -197,6 +214,57 @@ export async function POST(req: NextRequest) {
   } finally {
     clearTimeout(timeout);
     await safeDeleteBlob(blobUrl);
+  }
+
+  // --- Cleanup pass. If it fails for any reason we fall back to the raw text
+  // rather than failing the whole request, since raw output is still usable.
+  const cleaned = await cleanupTranscript(rawText);
+
+  return NextResponse.json({ text: cleaned ?? rawText }, { status: 200 });
+}
+
+async function cleanupTranscript(rawText: string): Promise<string | null> {
+  const anthropicKey = process.env.ANTHROPIC_API_KEY;
+  if (!anthropicKey) return null;
+
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 15000);
+
+  try {
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": anthropicKey,
+        "anthropic-version": "2023-06-01",
+      },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-5",
+        max_tokens: 8000,
+        messages: [
+          {
+            role: "user",
+            content: CLEANUP_PROMPT + "\n\n" + rawText,
+          },
+        ],
+      }),
+      signal: controller.signal,
+    });
+
+    if (!response.ok) return null;
+
+    const data = await response.json();
+    const text = data?.content
+      ?.filter((block: any) => block?.type === "text")
+      ?.map((block: any) => block?.text ?? "")
+      ?.join("\n")
+      ?.trim();
+
+    return text && text.length > 0 ? text : null;
+  } catch {
+    return null;
+  } finally {
+    clearTimeout(timeout);
   }
 }
 
