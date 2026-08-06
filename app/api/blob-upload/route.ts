@@ -8,23 +8,24 @@ import { NextResponse } from "next/server";
 // body limit entirely, since the file bytes never pass through our server.
 export async function POST(request: Request): Promise<NextResponse> {
   const body = (await request.json()) as HandleUploadBody;
-
   try {
     const jsonResponse = await handleUpload({
       body,
       request,
       onBeforeGenerateToken: async () => {
         return {
-          access: "private",
+          // Deepgram fetches the recording by URL rather than receiving the
+          // bytes from us, so the blob has to be publicly readable. URLs
+          // carry a random suffix and are effectively unguessable, and the
+          // file is deleted right after transcription in /api/transcribe.
+          access: "public",
           addRandomSuffix: true,
-          // Match the same 25MB ceiling as OpenAI's Whisper endpoint, and
-          // restrict to audio/video so this token can't be used to upload
+          // Deepgram handles far larger files than Whisper did. This ceiling
+          // is a guard against runaway storage use, not a provider limit.
+          maximumSizeInBytes: 500 * 1024 * 1024,
+          // Restrict to audio/video so this token can't be used to upload
           // arbitrary files.
-          maximumSizeInBytes: 25 * 1024 * 1024,
           allowedContentTypes: ["audio/*", "video/*"],
-          // Blobs are short-lived scratch files used only to relay a
-          // recording to the transcription provider — they're deleted
-          // right after transcription in /api/transcribe.
           tokenPayload: JSON.stringify({}),
         };
       },
@@ -34,7 +35,6 @@ export async function POST(request: Request): Promise<NextResponse> {
         // with it.
       },
     });
-
     return NextResponse.json(jsonResponse);
   } catch (err) {
     return NextResponse.json(
